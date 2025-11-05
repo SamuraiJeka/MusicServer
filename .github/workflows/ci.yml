@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - backend
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Python
+      id: setup-python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Add dependencies
+      run: |
+        cd server
+        pip install poetry 
+        poetry install --with dev
+      
+    - name: Ruff linting
+      run: |
+        cd server
+        poetry run ruff check src
+    
+    - name: Check types with mypy
+      run: |
+        cd server
+        poetry run mypy src
