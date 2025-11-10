@@ -1,0 +1,174 @@
+.wrapper {
+  width: 100dvw;
+  height: 100dvh;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  background-color: #262424;
+  overflow: hidden;
+}
+
+.main_container {
+  width: 90%;
+  max-width: 1200px;
+  height: 500px;
+  aspect-ratio: 16 / 9;
+  margin: 120px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background: #063553;
+  border-radius: 8px;
+  color: white;
+  gap: 100px;
+  padding: 40px;
+  margin: 2vh
+}
+
+.main_text {
+  height: 100%;
+  text-align: left;
+  max-width: 35%;
+
+  h1{
+    font-family: "Ruslan Display";
+  }
+
+  p {
+    padding-top: 10px;
+    word-wrap: break-word;
+    word-break: break-word;
+    font-size: 16px;
+  }
+}
+
+.form_container {
+  background: #012b3f;
+  padding: 30px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.tab {
+  margin: 0 10px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #ccc;
+}
+
+.active {
+  color: #007BFF;
+  border-bottom: 2px solid #007BFF;
+}
+
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  input {
+    height: 36px;
+    padding-left: 10px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    background-color: #014861;
+    color: white;
+    font-size: 14px;
+    }
+
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.single_input{
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+
+input::placeholder {
+  color: #bbb;
+}
+
+.submit_btn {
+  width: 100%;
+  background-color: #007BFF;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: linear 0.15s;
+}
+
+.submit_btn:hover {
+  background-color: #0052ab;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #aaa;
+  margin: 15px 0;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #666;
+  }
+
+  span {
+    padding: 0 10px;
+    font-size: 14px;
+  }
+}
+
+.google_btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: white;
+  color: black;
+  border-radius: 6px;
+  padding: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+
+  img {
+    width: 20px;
+  }
+
+  &:hover {
+    background: #f2f2f2;
+  }
+}
