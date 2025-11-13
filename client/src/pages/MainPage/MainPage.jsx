@@ -1,10 +1,11 @@
 import styles from "./MainPage.module.scss"
+import AlbumList from "../../widgets/albumList/albumList";
 
 
 const MainPage = () => {
     return (
         <div className={styles.wrapper}>
-            <h4>Главная</h4>
+            <AlbumList/>
         </div>
          
     )
