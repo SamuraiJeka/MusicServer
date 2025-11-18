@@ -1,7 +1,7 @@
 import styles from "./MainPage.module.scss"
 
-import AlbumList from "../../widgets/albumList/albumList";
-import ArtistList from "../../widgets/ArtistList/ArtistList"
+import AlbumList from "../../widgets/AlbumList/AlbumList";
+import ArtistList from "../../widgets/ArtistList/ArtistList";
 import SongList from "../../widgets/SongList/SongList";
 
 

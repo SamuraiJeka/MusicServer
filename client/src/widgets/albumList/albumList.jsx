@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "./albumList.module.scss"
+import styles from "./AlbumList.module.scss"
 
 
 const AlbumList = () => {
@@ -57,5 +57,6 @@ const AlbumList = () => {
         </div>
     )
 };
+
 
 export default AlbumList;
