@@ -2,7 +2,7 @@ import { useState } from "react";
 import styles from "./AlbumList.module.scss"
 
 
-const AlbumList = () => {
+const AlbumList = ({title}) => {
 
     const [data, setData] = useState([
         {
@@ -38,7 +38,7 @@ const AlbumList = () => {
     return (
         <div className={styles.wrapper}>
             <div className={styles.title_list}>
-                <h1>Тест тут такой <span>есть</span></h1>
+                {title}
             </div>
             <div className={styles.album_list}>
                 {
