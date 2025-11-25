@@ -1,11 +1,12 @@
 from datetime import timedelta
 
+from domain.user_model import User
 from domain.track_model import Track
 
 
 class TrackList:
-    def __init__(self, user_id: int, title: str, track_list: list[Track] = []):
-        self.user_id = user_id
+    def __init__(self, owner: User, title: str, track_list: list[Track] | None = None):
+        self.owner = owner
         self.title = title
         self.track_list = track_list
 
@@ -18,7 +19,7 @@ class TrackList:
         return other.track_list == self.track_list
 
     def __hash__(self):
-        return hash((self.user_id, self.title))
+        return hash((self.owner.email, self.title))
 
     async def add_track(self, track: Track) -> None:
         self.track_list.append(track)
