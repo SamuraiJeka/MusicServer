@@ -6,6 +6,9 @@ class RepositoryInterface(ABC):
     async def get(*args, **kwargs):
         raise NotImplementedError
     
+    async def get_list(*args, **kwargs):
+        raise NotImplementedError
+    
     @abstractmethod
     async def post(*args, **kwargs):
         raise NotImplementedError
