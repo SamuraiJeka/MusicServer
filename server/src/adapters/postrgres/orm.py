@@ -10,9 +10,9 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import mapper, relationship
 
-from domain.user_model import User
-from domain.track_model import Track
-from domain.track_list_model import TrackList
+from domain.entities.user import User
+from domain.entities.track import Track
+from domain.entities.track_list import TrackList
 
 metadata = MetaData()
 

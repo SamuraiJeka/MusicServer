@@ -1,7 +1,7 @@
 from datetime import timedelta
 
-from domain.user_model import User
-from domain.track_model import Track
+from server.src.domain.entities.user import User
+from server.src.domain.entities.track import Track
 
 
 class TrackList:
