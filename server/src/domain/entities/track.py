@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import timedelta
 
-from server.src.domain.entities.user import User
+from domain.entities.user import User
 
 
 @dataclass(frozen=False)

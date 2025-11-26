@@ -1,14 +1,14 @@
 from datetime import timedelta
 
-from server.src.domain.entities.user import User
-from server.src.domain.entities.track import Track
+from domain.entities.user import User
+from domain.entities.track import Track
 
 
 class TrackList:
     def __init__(self, owner: User, title: str, track_list: list[Track] | None = None):
         self.owner = owner
         self.title = title
-        self.track_list = track_list
+        self.track_list = track_list if track_list is not None else []
 
     def __repr__(self):
         return f"<TrackList {self.title}>"
