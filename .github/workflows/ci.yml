@@ -23,7 +23,7 @@ jobs:
       run: |
         cd server
         pip install poetry 
-        poetry install --with dev
+        poetry install
       
     - name: Ruff linting
       run: |
