@@ -26,7 +26,7 @@ class SqlAlchemyUnitOfWork(UoWInterface):
         await self.session.close()
     
     async def commit(self) -> None:
-        self.session.commit()
+        await self.session.commit()
     
     async def rollback(self):
-        self.session.rollback()
+        await self.session.rollback()
