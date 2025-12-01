@@ -1,8 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from adapters.postrgres.engine import session_factory
-from adapters.postrgres.repositories.user_repository import UserRepository
-from adapters.postrgres.repositories.track_list_repository import TrackListRepository
+from adapters.postgres.engine import session_factory
+from adapters.postgres.repositories.user_repository import UserRepository
+from adapters.postgres.repositories.track_list_repository import TrackListRepository
 from domain.ports.uow_interface import UoWInterface
 
 
