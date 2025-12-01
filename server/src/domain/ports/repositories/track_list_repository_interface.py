@@ -10,13 +10,17 @@ class TrackListRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def insert(self, track_list: TrackList, track: Track) -> TrackList:
-        raise NotImplementedError
-    
-    @abstractmethod
-    async def remove(self, track_list: TrackList, track: Track) -> TrackList:
+    async def get_by_id(self, track_list_id: int) -> TrackList | None:
         raise NotImplementedError
 
     @abstractmethod
-    async def delete(self, track_list: TrackList) -> bool:
+    async def add_track(self, track_list: TrackList, track: Track) -> TrackList:
+        raise NotImplementedError
+    
+    @abstractmethod
+    async def remove_track(self, track_list: TrackList, track: Track) -> TrackList:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def delete_by_id(self, track_list: TrackList) -> bool:
         raise NotImplementedError

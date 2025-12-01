@@ -5,7 +5,7 @@ from domain.entities.user import User
 
 class UserRepositoryInterface(ABC):
     @abstractmethod
-    async def add(self, user: User) -> User:
+    async def create(self, user: User) -> User:
         raise NotImplementedError
     
     @abstractmethod

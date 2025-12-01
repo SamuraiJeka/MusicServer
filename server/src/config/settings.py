@@ -6,9 +6,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     POSTGRES_DB: str
     POSTGRES_USER: str
-    POSTGRES_PASSWORD="postgres_password"
-    POSTGRES_HOST="qhost"
-    POSTGRES_PORT="postgres_port"
+    POSTGRES_PASSWORD: str
+    POSTGRES_HOST: str
+    POSTGRES_PORT: int
+    POSTGRES_ECHO: bool
 
     @property
     def postgres_url(self):
