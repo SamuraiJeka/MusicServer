@@ -22,6 +22,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.12.7"
 mypy = "^1.17.1"
+pytest = "^9.0.1"
 
 [tool.poetry]
 package-mode = false

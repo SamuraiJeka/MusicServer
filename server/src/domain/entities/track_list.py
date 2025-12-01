@@ -1,14 +1,14 @@
 from datetime import timedelta
 
-from domain.entities.user import User
-from domain.entities.track import Track
+from src.domain.entities.user import User
+from src.domain.entities.track import Track
 
 
 class TrackList:
-    def __init__(self, owner: User, title: str, track_list: list[Track] | None = None):
+    def __init__(self, owner: User, title: str):
         self.owner = owner
         self.title = title
-        self.track_list = track_list if track_list is not None else []
+        self.track_list = []
 
     def __repr__(self):
         return f"<TrackList {self.title}>"
@@ -21,10 +21,10 @@ class TrackList:
     def __hash__(self):
         return hash((self.owner.email, self.title))
 
-    async def add_track(self, track: Track) -> None:
+    def add_track(self, track: Track) -> None:
         self.track_list.append(track)
 
-    async def remove_track(self, track: Track) -> None:
+    def remove_track(self, track: Track) -> None:
         self.track_list.remove(track)
 
     @property
