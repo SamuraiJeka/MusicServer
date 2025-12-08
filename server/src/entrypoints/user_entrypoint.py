@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-router = APIRouter(prefix="user")
+router = APIRouter(prefix="/user", tags=["user"])
 
 
 @router.get("/test", status_code=200)
