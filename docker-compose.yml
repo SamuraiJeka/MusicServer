@@ -29,6 +29,5 @@ services:
       postgres:
         condition: service_started
 
-
 volumes:
   postgres-data:

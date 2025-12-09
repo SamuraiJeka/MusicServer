@@ -9,6 +9,7 @@ ENV PYTHONPATH="/server/src"
 EXPOSE 5000
 
 COPY ["./pyproject.toml", "./alembic.ini", "./"]
+COPY "./migrations" "/server/migrations"
 COPY "./src" "/server/src"
 
 RUN pip install poetry && poetry install

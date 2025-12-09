@@ -8,6 +8,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
+from src.config.settings import settings
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
@@ -16,6 +17,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "s
 from src.adapters.postgres.orm import metadata
 
 config = context.config
+config.set_main_option("sqlalchemy.url", settings.postgres_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
