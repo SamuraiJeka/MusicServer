@@ -7,13 +7,14 @@ from sqlalchemy import (
     Interval,
     ForeignKey,
 )
-from sqlalchemy.orm import mapper, relationship
+from sqlalchemy.orm import registry, relationship, clear_mappers
 
 from domain.entities.user import User
 from domain.entities.track import Track
 from domain.entities.track_list import TrackList
 
 metadata = MetaData()
+mapper_registry = registry()
 
 
 users = Table(
@@ -55,9 +56,10 @@ tracks_track_lists = Table(
     Column("track_list_id", ForeignKey("track_lists.id")),
 )
 
-
 def start_mappers():
-    mapper(
+    clear_mappers()
+
+    mapper_registry.map_imperatively(
         User,
         users,
         properties={
@@ -65,7 +67,8 @@ def start_mappers():
             "track_lists": relationship(TrackList, back_populates="owner"),
         },
     )
-    mapper(
+
+    mapper_registry.map_imperatively(
         Track,
         tracks,
         properties={
@@ -77,7 +80,8 @@ def start_mappers():
             ),
         },
     )
-    mapper(
+
+    mapper_registry.map_imperatively(
         TrackList,
         track_lists,
         properties={

@@ -6,3 +6,4 @@ class User:
     email: str
     hash_password: str
     username: str
+    id: int | None = None

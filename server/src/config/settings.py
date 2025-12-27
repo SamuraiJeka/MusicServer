@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -10,6 +8,10 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: int
     POSTGRES_ECHO: bool
+    SECRET_KEY: str
+    ALGORITHM: str
+    ACCESS_EXPIRES_MIN: int
+    REFRESH_EXPIRES_DAY: int
 
     @property
     def postgres_url(self):
