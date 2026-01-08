@@ -8,10 +8,10 @@ from domain.ports.uow_interface import UoWInterface
 class SqlAlchemyUnitOfWork(UoWInterface):
     def __init__(self, session: AsyncSession):
         self._session = session
-
-    async def __aenter__(self):
         self.user_repo = UserRepository(self._session)
         self.track_list_repo = TrackListRepository(self._session)
+
+    async def __aenter__(self):
         return self
     
     async def __aexit__(self, exc_type, exc, tb):
