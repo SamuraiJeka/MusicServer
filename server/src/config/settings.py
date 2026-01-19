@@ -12,6 +12,10 @@ class Settings(BaseSettings):
     ALGORITHM: str
     ACCESS_EXPIRES_MIN: int
     REFRESH_EXPIRES_DAY: int
+    MINIO_ENDPOINT: str
+    MINIO_BUCKET: str
+    MINIO_ACCESS_KEY: str
+    MINIO_SECRET_KEY: str
 
     @property
     def postgres_url(self):

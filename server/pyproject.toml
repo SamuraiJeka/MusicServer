@@ -20,6 +20,8 @@ psycopg-binary = "^3.3.2"
 bcrypt = "^5.0.0"
 pyjwt = "^2.10.1"
 pydantic = {extras = ["email"], version = "^2.12.5"}
+aioboto3 = "^15.5.0"
+python-multipart = "^0.0.21"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.12.7"
