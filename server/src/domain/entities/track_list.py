@@ -1,3 +1,4 @@
+from typing import Optional
 from datetime import timedelta
 
 from domain.entities.user import User
@@ -5,8 +6,9 @@ from domain.entities.track import Track
 
 
 class TrackList:
-    def __init__(self, owner: User, title: str):
-        self.owner = owner
+    def __init__(self, id: int | None, owner_id: int, title: str):
+        self.id = id
+        self.owner_id = owner_id
         self.title = title
         self.track_list: list[Track] = []
 

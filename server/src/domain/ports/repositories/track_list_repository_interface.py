@@ -18,9 +18,9 @@ class TrackListRepositoryInterface(ABC):
         raise NotImplementedError
     
     @abstractmethod
-    async def remove_track(self, track_list: TrackList, track: Track) -> TrackList:
+    async def remove_track(self, track_list: TrackList) -> TrackList:
         raise NotImplementedError
 
     @abstractmethod
-    async def delete_by_id(self, track_list: TrackList) -> bool:
+    async def delete_by_id(self, track_list_id: int) -> bool:
         raise NotImplementedError
