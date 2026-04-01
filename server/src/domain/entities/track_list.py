@@ -1,27 +1,30 @@
-from typing import Optional
 from datetime import timedelta
+from enum import Enum
 
-from domain.entities.user import User
 from domain.entities.track import Track
 
 
+class TrackListType(str, Enum):
+    ALBUM = "album"
+    PLAYLIST = "playlist"
+
+
 class TrackList:
-    def __init__(self, id: int | None, owner_id: int, title: str):
+    def __init__(
+        self,
+        id: int | None,
+        owner_id: int,
+        title: str,
+        _type: TrackListType
+        ):
         self.id = id
         self.owner_id = owner_id
         self.title = title
+        self._type = _type
         self.track_list: list[Track] = []
 
     def __repr__(self):
-        return f"<TrackList {self.title}>"
-
-    def __eq__(self, other):
-        if not isinstance(other, TrackList):
-            return False
-        return other.track_list == self.track_list
-
-    def __hash__(self):
-        return hash((self.owner.email, self.title))
+        return f"<TrackList {self.type_} {self.title}>"
 
     def add_track(self, track: Track) -> None:
         self.track_list.append(track)
