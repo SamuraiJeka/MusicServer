@@ -1,3 +1,15 @@
+[tool.mypy]
+python_version = "3.11"
+mypy_path = ["src"]
+exclude = [
+  "^\\.venv/",
+  "^migrations/",
+]
+
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unreachable = true
+
 [tool.poetry]
 name = "musicserver"
 version = "0.1.0"
@@ -22,6 +34,7 @@ pyjwt = "^2.10.1"
 pydantic = {extras = ["email"], version = "^2.12.5"}
 aioboto3 = "^15.5.0"
 python-multipart = "^0.0.21"
+mutagen = "^1.47.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.12.7"

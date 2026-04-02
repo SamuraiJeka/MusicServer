@@ -1,8 +1,8 @@
 """init
 
-Revision ID: 3068546816f1
+Revision ID: d81e4329f422
 Revises: 
-Create Date: 2025-12-09 09:39:11.704225
+Create Date: 2026-04-01 13:28:12.157669
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '3068546816f1'
+revision: str = 'd81e4329f422'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -33,19 +33,18 @@ def upgrade() -> None:
     sa.Column('id', sa.BigInteger(), autoincrement=True, nullable=False),
     sa.Column('title', sa.String(length=255), nullable=False),
     sa.Column('owner_id', sa.BigInteger(), nullable=False),
+    sa.Column('_type', sa.Enum('ALBUM', 'PLAYLIST', name='track_list_type'), nullable=False),
     sa.ForeignKeyConstraint(['owner_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('tracks',
     sa.Column('id', sa.BigInteger(), autoincrement=True, nullable=False),
     sa.Column('title', sa.String(length=255), nullable=False),
-    sa.Column('path_dir', sa.String(length=512), nullable=False),
     sa.Column('view', sa.BigInteger(), server_default='0', nullable=False),
     sa.Column('duration', sa.Interval(), nullable=False),
     sa.Column('owner_id', sa.BigInteger(), nullable=False),
     sa.ForeignKeyConstraint(['owner_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('path_dir')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('tracks_track_lists',
     sa.Column('id', sa.BigInteger(), autoincrement=True, nullable=False),

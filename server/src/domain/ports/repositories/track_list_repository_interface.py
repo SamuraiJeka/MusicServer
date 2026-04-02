@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Sequence
 
 from domain.entities.track_list import TrackList
 from domain.entities.track import Track
@@ -6,7 +7,7 @@ from domain.entities.track import Track
 
 class TrackListRepositoryInterface(ABC):
     @abstractmethod
-    async def create(self, track_list: TrackList):
+    async def create(self, track_list: TrackList) -> TrackList:
         raise NotImplementedError
 
     @abstractmethod
@@ -14,9 +15,9 @@ class TrackListRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def add_track(self, track_list: TrackList, track: Track) -> TrackList:
+    async def add_tracks(self, track_list: TrackList, tracks: Sequence[Track]) -> TrackList:
         raise NotImplementedError
-    
+
     @abstractmethod
     async def remove_track(self, track_list: TrackList) -> TrackList:
         raise NotImplementedError

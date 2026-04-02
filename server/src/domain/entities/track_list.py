@@ -24,7 +24,7 @@ class TrackList:
         self.track_list: list[Track] = []
 
     def __repr__(self):
-        return f"<TrackList {self.type_} {self.title}>"
+        return f"<TrackList {self._type} {self.title}>"
 
     def add_track(self, track: Track) -> None:
         self.track_list.append(track)

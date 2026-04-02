@@ -7,11 +7,12 @@ from sqlalchemy import (
     Interval,
     ForeignKey,
 )
+from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import registry, relationship, clear_mappers
 
 from domain.entities.user import User
 from domain.entities.track import Track
-from domain.entities.track_list import TrackList
+from domain.entities.track_list import TrackList, TrackListType
 
 metadata = MetaData()
 mapper_registry = registry()
@@ -32,7 +33,6 @@ tracks = Table(
     metadata,
     Column("id", BigInteger, primary_key=True, autoincrement=True),
     Column("title", String(255), nullable=False),
-    Column("path_dir", String(512), unique=True, nullable=False),
     Column("view", BigInteger, nullable=False, server_default="0"),
     Column("duration", Interval, nullable=False),
     Column("owner_id", ForeignKey("users.id"), nullable=False),
@@ -45,6 +45,7 @@ track_lists = Table(
     Column("id", BigInteger, primary_key=True, autoincrement=True),
     Column("title", String(255), nullable=False),
     Column("owner_id", ForeignKey("users.id"), nullable=False),
+    Column("_type", SAEnum(TrackListType, name="track_list_type"), nullable=False),
 )
 
 
