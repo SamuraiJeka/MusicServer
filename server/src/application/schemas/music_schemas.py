@@ -28,6 +28,12 @@ class AlbumSchema(BaseModel):
     tracks: List[TrackSchema]
 
 
+class AlbumSummarySchema(BaseModel):
+    id: PositiveInt
+    owner_id: PositiveInt
+    title: str
+
+
 class PostPlaylistSchema(BaseModel):
     title: str
     track_ids: Optional[list[PositiveInt]] = Field(default=None)
@@ -38,3 +44,9 @@ class PlaylistSchema(BaseModel):
     owner_id: PositiveInt
     title: str
     tracks: List[TrackSchema]
+
+
+class PlaylistSummarySchema(BaseModel):
+    id: PositiveInt
+    owner_id: PositiveInt
+    title: str

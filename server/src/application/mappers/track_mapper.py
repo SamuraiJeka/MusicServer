@@ -24,6 +24,8 @@ class TrackMapper:
 
     @staticmethod
     async def entity_to_dto(entity: Track) -> TrackSchema:
+        if entity.id is None:
+            raise ValueError("Track must be persisted before mapping to DTO")
         return TrackSchema(
             id=entity.id,
             owner_id=entity.owner_id,

@@ -20,7 +20,7 @@ class UserRepository(UserRepositoryInterface):
         return result.scalar_one_or_none()
 
     async def get_by_email(self, email: str) -> User | None:
-        stmt = select(User).where(User.email == email) 
+        stmt = select(User).where(User.email == email)  # type: ignore[arg-type]
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 

@@ -5,7 +5,7 @@ from sqlalchemy import select, delete
 from sqlalchemy.orm import selectinload
 
 from domain.ports.repositories.track_list_repository_interface import TrackListRepositoryInterface
-from domain.entities.track_list import TrackList
+from domain.entities.track_list import TrackList, TrackListType
 from domain.entities.track import Track
 
 
@@ -19,9 +19,27 @@ class TrackListRepository(TrackListRepositoryInterface):
         return track_list
 
     async def get_by_id(self, track_list_id: int) -> TrackList | None:
-        stmt = select(TrackList).options(selectinload(TrackList.track_list)).where(TrackList.id == track_list_id)
+        stmt = (
+            select(TrackList)
+            .options(selectinload(TrackList.track_list))  # type: ignore[arg-type]
+            .where(TrackList.id == track_list_id)  # type: ignore[arg-type]
+        )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
+
+    async def list_by_owner_and_type(
+        self, owner_id: int, list_type: TrackListType
+    ) -> list[TrackList]:
+        stmt = (
+            select(TrackList)
+            .where(
+                TrackList.owner_id == owner_id,  # type: ignore[arg-type]
+                TrackList._type == list_type,  # type: ignore[arg-type]
+            )
+            .order_by(TrackList.id.desc())  # type: ignore[union-attr]
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
 
     async def add_tracks(self, track_list: TrackList, tracks: Sequence[Track]) -> TrackList:
         self._session.add(track_list)
@@ -34,7 +52,7 @@ class TrackListRepository(TrackListRepositoryInterface):
         return track_list
 
     async def delete_by_id(self, track_list_id: int) -> bool:
-        stmt = delete(TrackList).where(TrackList.id == track_list_id)
+        stmt = delete(TrackList).where(TrackList.id == track_list_id)  # type: ignore[arg-type]
         result = await self._session.execute(stmt)
         await self._session.commit()
         return bool(result)

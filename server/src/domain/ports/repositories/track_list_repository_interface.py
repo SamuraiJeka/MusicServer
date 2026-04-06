@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Sequence
 
-from domain.entities.track_list import TrackList
+from domain.entities.track_list import TrackList, TrackListType
 from domain.entities.track import Track
 
 
@@ -12,6 +12,12 @@ class TrackListRepositoryInterface(ABC):
 
     @abstractmethod
     async def get_by_id(self, track_list_id: int) -> TrackList | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def list_by_owner_and_type(
+        self, owner_id: int, list_type: TrackListType
+    ) -> list[TrackList]:
         raise NotImplementedError
 
     @abstractmethod
