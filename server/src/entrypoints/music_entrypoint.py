@@ -6,7 +6,6 @@ from fastapi import (
     Form,
     HTTPException,
     Query,
-    status,
 )
 
 from entrypoints.dependencies import get_authenticated_user, get_uow
