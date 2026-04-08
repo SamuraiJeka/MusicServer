@@ -86,4 +86,5 @@ class TrackListRepository(TrackListRepositoryInterface):
         )
         result = await self._session.execute(stmt_album)
         await self._session.commit()
-        return bool(result.rowcount)
+        rowcount = getattr(result, "rowcount", 0)
+        return bool(rowcount)

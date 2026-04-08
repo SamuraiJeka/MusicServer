@@ -24,6 +24,7 @@ from application.schemas.music_schemas import (
     TrackSchema,
 )
 from application.services.music_service import MusicService
+from application.exceptions import ApplicationError
 
 router = APIRouter(prefix="/music", tags=["music"])
 
@@ -47,8 +48,8 @@ async def get_album(
     async with uow:
         try:
             return await MusicService(uow).get_album(album_id)
-        except ValueError as e:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
 
 
 @router.patch("/albums/{album_id}", response_model=AlbumSummarySchema)
@@ -61,10 +62,8 @@ async def patch_album(
     async with uow:
         try:
             return await MusicService(uow).patch_album(user=user, album_id=album_id, title=dto.title)
-        except ValueError as e:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(e)) from e
-        except PermissionError as e:
-            raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(e)) from e
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
 
 
 @router.get("/users/{user_id}/albums", response_model=list[AlbumSummarySchema])
@@ -86,8 +85,8 @@ async def list_album_tracks(
     async with uow:
         try:
             return await MusicService(uow).list_album_tracks(album_id)
-        except ValueError as e:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
 
 
 @router.get("/playlists/{playlist_id}/tracks", response_model=list[TrackSchema])
@@ -99,10 +98,8 @@ async def list_playlist_tracks(
     async with uow:
         try:
             return await MusicService(uow).list_playlist_tracks(user, playlist_id)
-        except ValueError as e:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(e)) from e
-        except PermissionError as e:
-            raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(e)) from e
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
 
 
 @router.get("/me/tracks", response_model=list[TrackSchema])
@@ -176,8 +173,8 @@ async def delete_track_from_album(
     async with uow:
         try:
             return await MusicService(uow).remove_track_from_album(user=user, album_id=album_id, track_id=track_id)
-        except PermissionError as e:
-            raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(e)) from e
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
 
 
 @router.delete("/albums/{album_id}")
@@ -189,8 +186,8 @@ async def delete_album(
     async with uow:
         try:
             return await MusicService(uow).delete_album(user=user, album_id=album_id)
-        except PermissionError as e:
-            raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(e)) from e
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
 
 
 @router.post("/playlists", response_model=PlaylistSchema)

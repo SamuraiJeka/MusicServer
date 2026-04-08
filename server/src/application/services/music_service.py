@@ -15,11 +15,12 @@ from application.mappers.track_list_mapper import TrackListMapper
 from application.mappers.track_mapper import TrackMapper
 from domain.entities.track_list import TrackList, TrackListType
 from domain.entities.track import Track
+from application.exceptions import BadRequestError, ForbiddenError, NotFoundError
 
 
 def _require_user_id(user: UserSchema) -> int:
     if user.id is None:
-        raise ValueError("Authenticated user must have id")
+        raise BadRequestError("Authenticated user must have id")
     return user.id
 
 
@@ -43,9 +44,9 @@ class MusicService:
     ) -> AlbumSchema:
         album = await self._uow.track_list_repo.get_by_id(album_id)
         if album is None or album._type != TrackListType.ALBUM:
-            raise ValueError("Album does not exist.")
+            raise NotFoundError("Album does not exist.")
         if album.owner_id != _require_user_id(user):
-            raise PermissionError("User is not the owner of the album.")
+            raise ForbiddenError("User is not the owner of the album.")
 
         track_entity = await self._create_track_for_album(user=user, album=album, track_dto=track_dto)
         album = await self._uow.track_list_repo.add_tracks(album, [track_entity])
@@ -59,7 +60,7 @@ class MusicService:
     ) -> Track:
         duration = get_mp3_duration(track_dto.content)
         if duration is None:
-            raise ValueError("Could not read audio duration")
+            raise BadRequestError("Could not read audio duration")
         owner_id = _require_user_id(user)
         track_entity: Track = await TrackMapper.dto_to_entity(
             owner_id=owner_id,
@@ -110,13 +111,13 @@ class MusicService:
     ) -> PlaylistSchema:
         playlist = await self._uow.track_list_repo.get_by_id(playlist_id)
         if playlist is None or playlist._type != TrackListType.PLAYLIST:
-            raise ValueError("Playlist does not exist.")
+            raise NotFoundError("Playlist does not exist.")
         if playlist.owner_id != _require_user_id(user):
-            raise PermissionError("User is not the owner of the playlist.")
+            raise ForbiddenError("User is not the owner of the playlist.")
 
         track = await self._uow.track_repo.get_by_id(track_id)
         if track is None:
-            raise ValueError("Track does not exist.")
+            raise NotFoundError("Track does not exist.")
 
         playlist.add_track(track)
         playlist = await self._uow.track_list_repo.add_tracks(playlist, [track])
@@ -132,7 +133,7 @@ class MusicService:
         if playlist is None or playlist._type != TrackListType.PLAYLIST:
             return False
         if playlist.owner_id != _require_user_id(user):
-            raise PermissionError("User is not the owner of the playlist.")
+            raise ForbiddenError("User is not the owner of the playlist.")
 
         track = await self._uow.track_repo.get_by_id(track_id)
         if track is None:
@@ -145,7 +146,7 @@ class MusicService:
     async def list_album_tracks(self, album_id: int) -> list[TrackSchema]:
         album = await self._uow.track_list_repo.get_by_id(album_id)
         if album is None or album._type != TrackListType.ALBUM:
-            raise ValueError("Album not found.")
+            raise NotFoundError("Album not found.")
         return [
             await TrackMapper.entity_to_dto(track)
             for track in album.track_list
@@ -156,9 +157,9 @@ class MusicService:
     ) -> list[TrackSchema]:
         playlist = await self._uow.track_list_repo.get_by_id(playlist_id)
         if playlist is None or playlist._type != TrackListType.PLAYLIST:
-            raise ValueError("Playlist not found.")
+            raise NotFoundError("Playlist not found.")
         if playlist.owner_id != _require_user_id(user):
-            raise PermissionError("Playlist is private.")
+            raise ForbiddenError("Playlist is private.")
         return [
             await TrackMapper.entity_to_dto(track)
             for track in playlist.track_list
@@ -191,7 +192,7 @@ class MusicService:
     async def get_album(self, album_id: int) -> AlbumSummarySchema:
         album = await self._uow.track_list_repo.get_by_id(album_id)
         if album is None or album._type != TrackListType.ALBUM:
-            raise ValueError("Album not found.")
+            raise NotFoundError("Album not found.")
         return TrackListMapper.album_entity_to_summary(album)
 
     async def list_albums(
@@ -215,9 +216,9 @@ class MusicService:
     ) -> AlbumSummarySchema:
         album = await self._uow.track_list_repo.get_by_id(album_id)
         if album is None or album._type != TrackListType.ALBUM:
-            raise ValueError("Album not found.")
+            raise NotFoundError("Album not found.")
         if album.owner_id != _require_user_id(user):
-            raise PermissionError("User is not the owner of the album.")
+            raise ForbiddenError("User is not the owner of the album.")
 
         album.title = title
         # TrackList уже в сессии, flush на выходе UoW зафиксирует изменения
@@ -233,7 +234,7 @@ class MusicService:
         if album is None or album._type != TrackListType.ALBUM:
             return False
         if album.owner_id != _require_user_id(user):
-            raise PermissionError("User is not the owner of the album.")
+            raise ForbiddenError("User is not the owner of the album.")
 
         track = next((t for t in album.track_list if t.id == track_id), None)
         if track is None:
@@ -248,6 +249,6 @@ class MusicService:
         if album is None or album._type != TrackListType.ALBUM:
             return False
         if album.owner_id != _require_user_id(user):
-            raise PermissionError("User is not the owner of the album.")
+            raise ForbiddenError("User is not the owner of the album.")
 
         return await self._uow.track_list_repo.delete_album_by_id(album_id)
