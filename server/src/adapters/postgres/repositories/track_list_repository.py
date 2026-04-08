@@ -7,6 +7,7 @@ from sqlalchemy.orm import selectinload
 from domain.ports.repositories.track_list_repository_interface import TrackListRepositoryInterface
 from domain.entities.track_list import TrackList, TrackListType
 from domain.entities.track import Track
+from adapters.postgres.orm import tracks_track_lists
 
 
 class TrackListRepository(TrackListRepositoryInterface):
@@ -74,3 +75,15 @@ class TrackListRepository(TrackListRepositoryInterface):
         result = await self._session.execute(stmt)
         await self._session.commit()
         return bool(result)
+
+    async def delete_album_by_id(self, album_id: int) -> bool:
+        stmt_links = delete(tracks_track_lists).where(tracks_track_lists.c.track_list_id == album_id)
+        await self._session.execute(stmt_links)
+
+        stmt_album = delete(TrackList).where(
+            TrackList.id == album_id,  # type: ignore[arg-type]
+            TrackList._type == TrackListType.ALBUM,  # type: ignore[arg-type]
+        )
+        result = await self._session.execute(stmt_album)
+        await self._session.commit()
+        return bool(result.rowcount)

@@ -206,3 +206,48 @@ class MusicService:
             owner_id=owner_id,
         )
         return [TrackListMapper.album_entity_to_summary(a) for a in albums]
+
+    async def patch_album(
+        self,
+        user: UserSchema,
+        album_id: int,
+        title: str,
+    ) -> AlbumSummarySchema:
+        album = await self._uow.track_list_repo.get_by_id(album_id)
+        if album is None or album._type != TrackListType.ALBUM:
+            raise ValueError("Album not found.")
+        if album.owner_id != _require_user_id(user):
+            raise PermissionError("User is not the owner of the album.")
+
+        album.title = title
+        # TrackList уже в сессии, flush на выходе UoW зафиксирует изменения
+        return TrackListMapper.album_entity_to_summary(album)
+
+    async def remove_track_from_album(
+        self,
+        user: UserSchema,
+        album_id: int,
+        track_id: int,
+    ) -> bool:
+        album = await self._uow.track_list_repo.get_by_id(album_id)
+        if album is None or album._type != TrackListType.ALBUM:
+            return False
+        if album.owner_id != _require_user_id(user):
+            raise PermissionError("User is not the owner of the album.")
+
+        track = next((t for t in album.track_list if t.id == track_id), None)
+        if track is None:
+            return False
+
+        album.remove_track(track)
+        await self._uow.track_list_repo.remove_track(album)
+        return True
+
+    async def delete_album(self, user: UserSchema, album_id: int) -> bool:
+        album = await self._uow.track_list_repo.get_by_id(album_id)
+        if album is None or album._type != TrackListType.ALBUM:
+            return False
+        if album.owner_id != _require_user_id(user):
+            raise PermissionError("User is not the owner of the album.")
+
+        return await self._uow.track_list_repo.delete_album_by_id(album_id)

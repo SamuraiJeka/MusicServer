@@ -34,6 +34,10 @@ class AlbumSummarySchema(BaseModel):
     title: str
 
 
+class PatchAlbumSchema(BaseModel):
+    title: str
+
+
 class PostPlaylistSchema(BaseModel):
     title: str
     track_ids: Optional[list[PositiveInt]] = Field(default=None)

@@ -16,6 +16,7 @@ from application.schemas.music_schemas import (
     PostAlbumSchema,
     AlbumSchema,
     AlbumSummarySchema,
+    PatchAlbumSchema,
     PostPlaylistSchema,
     PlaylistSchema,
     PlaylistSummarySchema,
@@ -48,6 +49,22 @@ async def get_album(
             return await MusicService(uow).get_album(album_id)
         except ValueError as e:
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+
+
+@router.patch("/albums/{album_id}", response_model=AlbumSummarySchema)
+async def patch_album(
+    album_id: int,
+    dto: PatchAlbumSchema,
+    user: UserSchema = Depends(get_authenticated_user),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> AlbumSummarySchema:
+    async with uow:
+        try:
+            return await MusicService(uow).patch_album(user=user, album_id=album_id, title=dto.title)
+        except ValueError as e:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        except PermissionError as e:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(e)) from e
 
 
 @router.get("/users/{user_id}/albums", response_model=list[AlbumSummarySchema])
@@ -147,6 +164,33 @@ async def add_track_to_album(
     track_dto = PostTrackSchema(title=title, content=content)
     async with uow:
         return await MusicService(uow).add_track_to_album(user, album_id, track_dto)
+
+
+@router.delete("/albums/{album_id}/tracks/{track_id}")
+async def delete_track_from_album(
+    album_id: int,
+    track_id: int,
+    user: UserSchema = Depends(get_authenticated_user),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> bool:
+    async with uow:
+        try:
+            return await MusicService(uow).remove_track_from_album(user=user, album_id=album_id, track_id=track_id)
+        except PermissionError as e:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(e)) from e
+
+
+@router.delete("/albums/{album_id}")
+async def delete_album(
+    album_id: int,
+    user: UserSchema = Depends(get_authenticated_user),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> bool:
+    async with uow:
+        try:
+            return await MusicService(uow).delete_album(user=user, album_id=album_id)
+        except PermissionError as e:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(e)) from e
 
 
 @router.post("/playlists", response_model=PlaylistSchema)
