@@ -27,6 +27,40 @@ from application.services.music_service import MusicService
 router = APIRouter(prefix="/music", tags=["music"])
 
 
+@router.get("/albums", response_model=list[AlbumSummarySchema])
+async def list_albums(
+    limit: int = Query(default=50, ge=1, le=200),
+    offset: int = Query(default=0, ge=0),
+    owner_id: int | None = Query(default=None, ge=1),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> list[AlbumSummarySchema]:
+    async with uow:
+        return await MusicService(uow).list_albums(limit=limit, offset=offset, owner_id=owner_id)
+
+
+@router.get("/albums/{album_id}", response_model=AlbumSummarySchema)
+async def get_album(
+    album_id: int,
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> AlbumSummarySchema:
+    async with uow:
+        try:
+            return await MusicService(uow).get_album(album_id)
+        except ValueError as e:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+
+
+@router.get("/users/{user_id}/albums", response_model=list[AlbumSummarySchema])
+async def list_user_albums(
+    user_id: int,
+    limit: int = Query(default=50, ge=1, le=200),
+    offset: int = Query(default=0, ge=0),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> list[AlbumSummarySchema]:
+    async with uow:
+        return await MusicService(uow).list_albums(limit=limit, offset=offset, owner_id=user_id)
+
+
 @router.get("/albums/{album_id}/tracks", response_model=list[TrackSchema])
 async def list_album_tracks(
     album_id: int,

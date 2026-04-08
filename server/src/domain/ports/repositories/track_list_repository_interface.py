@@ -21,6 +21,15 @@ class TrackListRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def list_albums(
+        self,
+        limit: int,
+        offset: int,
+        owner_id: int | None = None,
+    ) -> list[TrackList]:
+        raise NotImplementedError
+
+    @abstractmethod
     async def add_tracks(self, track_list: TrackList, tracks: Sequence[Track]) -> TrackList:
         raise NotImplementedError
 

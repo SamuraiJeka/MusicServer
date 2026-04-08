@@ -41,6 +41,24 @@ class TrackListRepository(TrackListRepositoryInterface):
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
+    async def list_albums(
+        self,
+        limit: int,
+        offset: int,
+        owner_id: int | None = None,
+    ) -> list[TrackList]:
+        stmt = select(TrackList).where(TrackList._type == TrackListType.ALBUM)  # type: ignore[arg-type]
+        if owner_id is not None:
+            stmt = stmt.where(TrackList.owner_id == owner_id)  # type: ignore[arg-type]
+
+        stmt = (
+            stmt.order_by(TrackList.id.desc())  # type: ignore[union-attr]
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
     async def add_tracks(self, track_list: TrackList, tracks: Sequence[Track]) -> TrackList:
         self._session.add(track_list)
         await self._session.flush()

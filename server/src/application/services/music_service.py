@@ -187,3 +187,22 @@ class MusicService:
     async def list_popular_tracks(self, limit: int) -> list[TrackSchema]:
         tracks = await self._uow.track_repo.list_order_by_view_desc(limit)
         return [await TrackMapper.entity_to_dto(t) for t in tracks]
+
+    async def get_album(self, album_id: int) -> AlbumSummarySchema:
+        album = await self._uow.track_list_repo.get_by_id(album_id)
+        if album is None or album._type != TrackListType.ALBUM:
+            raise ValueError("Album not found.")
+        return TrackListMapper.album_entity_to_summary(album)
+
+    async def list_albums(
+        self,
+        limit: int,
+        offset: int,
+        owner_id: int | None = None,
+    ) -> list[AlbumSummarySchema]:
+        albums = await self._uow.track_list_repo.list_albums(
+            limit=limit,
+            offset=offset,
+            owner_id=owner_id,
+        )
+        return [TrackListMapper.album_entity_to_summary(a) for a in albums]
