@@ -19,6 +19,8 @@ from application.schemas.music_schemas import (
     PostPlaylistSchema,
     PlaylistSchema,
     PlaylistSummarySchema,
+    PatchPlaylistSchema,
+    BulkAddTracksSchema,
     PostTrackSchema,
     TrackSchema,
 )
@@ -97,6 +99,19 @@ async def list_playlist_tracks(
     async with uow:
         try:
             return await MusicService(uow).list_playlist_tracks(user, playlist_id)
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
+
+
+@router.get("/playlists/{playlist_id}", response_model=PlaylistSchema)
+async def get_playlist(
+    playlist_id: int,
+    user: UserSchema = Depends(get_authenticated_user),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> PlaylistSchema:
+    async with uow:
+        try:
+            return await MusicService(uow).get_playlist(user=user, playlist_id=playlist_id)
         except ApplicationError as e:
             raise HTTPException(status_code=e.status_code, detail=e.detail) from e
 
@@ -208,6 +223,55 @@ async def add_track_to_playlist(
 ) -> PlaylistSchema:
     async with uow:
         return await MusicService(uow).add_track_to_playlist(user, playlist_id, track_id)
+
+
+@router.post("/playlists/{playlist_id}/tracks/bulk", response_model=PlaylistSchema)
+async def add_tracks_to_playlist_bulk(
+    playlist_id: int,
+    dto: BulkAddTracksSchema,
+    user: UserSchema = Depends(get_authenticated_user),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> PlaylistSchema:
+    async with uow:
+        try:
+            return await MusicService(uow).add_tracks_to_playlist_bulk(
+                user=user,
+                playlist_id=playlist_id,
+                track_ids=[int(tid) for tid in dto.track_ids],
+            )
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
+
+
+@router.patch("/playlists/{playlist_id}", response_model=PlaylistSummarySchema)
+async def patch_playlist(
+    playlist_id: int,
+    dto: PatchPlaylistSchema,
+    user: UserSchema = Depends(get_authenticated_user),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> PlaylistSummarySchema:
+    async with uow:
+        try:
+            return await MusicService(uow).patch_playlist(
+                user=user,
+                playlist_id=playlist_id,
+                title=dto.title,
+            )
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
+
+
+@router.delete("/playlists/{playlist_id}")
+async def delete_playlist(
+    playlist_id: int,
+    user: UserSchema = Depends(get_authenticated_user),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> bool:
+    async with uow:
+        try:
+            return await MusicService(uow).delete_playlist(user=user, playlist_id=playlist_id)
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
 
 
 @router.delete("/playlists/{playlist_id}/tracks/{track_id}")

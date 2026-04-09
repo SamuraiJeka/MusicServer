@@ -88,3 +88,16 @@ class TrackListRepository(TrackListRepositoryInterface):
         await self._session.commit()
         rowcount = getattr(result, "rowcount", 0)
         return bool(rowcount)
+
+    async def delete_playlist_by_id(self, playlist_id: int) -> bool:
+        stmt_links = delete(tracks_track_lists).where(tracks_track_lists.c.track_list_id == playlist_id)
+        await self._session.execute(stmt_links)
+
+        stmt_playlist = delete(TrackList).where(
+            TrackList.id == playlist_id,  # type: ignore[arg-type]
+            TrackList._type == TrackListType.PLAYLIST,  # type: ignore[arg-type]
+        )
+        result = await self._session.execute(stmt_playlist)
+        await self._session.commit()
+        rowcount = getattr(result, "rowcount", 0)
+        return bool(rowcount)

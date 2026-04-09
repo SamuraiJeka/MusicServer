@@ -54,3 +54,11 @@ class PlaylistSummarySchema(BaseModel):
     id: PositiveInt
     owner_id: PositiveInt
     title: str
+
+
+class PatchPlaylistSchema(BaseModel):
+    title: str
+
+
+class BulkAddTracksSchema(BaseModel):
+    track_ids: list[PositiveInt]

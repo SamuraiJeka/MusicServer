@@ -44,3 +44,7 @@ class TrackListRepositoryInterface(ABC):
     @abstractmethod
     async def delete_album_by_id(self, album_id: int) -> bool:
         raise NotImplementedError
+
+    @abstractmethod
+    async def delete_playlist_by_id(self, playlist_id: int) -> bool:
+        raise NotImplementedError

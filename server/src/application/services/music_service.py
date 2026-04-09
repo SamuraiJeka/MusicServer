@@ -252,3 +252,56 @@ class MusicService:
             raise ForbiddenError("User is not the owner of the album.")
 
         return await self._uow.track_list_repo.delete_album_by_id(album_id)
+
+    async def get_playlist(self, user: UserSchema, playlist_id: int) -> PlaylistSchema:
+        playlist = await self._uow.track_list_repo.get_by_id(playlist_id)
+        if playlist is None or playlist._type != TrackListType.PLAYLIST:
+            raise NotFoundError("Playlist not found.")
+        if playlist.owner_id != _require_user_id(user):
+            raise ForbiddenError("Playlist is private.")
+        return await TrackListMapper.playlist_entity_to_dto(playlist)
+
+    async def patch_playlist(
+        self,
+        user: UserSchema,
+        playlist_id: int,
+        title: str,
+    ) -> PlaylistSummarySchema:
+        playlist = await self._uow.track_list_repo.get_by_id(playlist_id)
+        if playlist is None or playlist._type != TrackListType.PLAYLIST:
+            raise NotFoundError("Playlist not found.")
+        if playlist.owner_id != _require_user_id(user):
+            raise ForbiddenError("User is not the owner of the playlist.")
+        playlist.title = title
+        return TrackListMapper.playlist_entity_to_summary(playlist)
+
+    async def delete_playlist(self, user: UserSchema, playlist_id: int) -> bool:
+        playlist = await self._uow.track_list_repo.get_by_id(playlist_id)
+        if playlist is None or playlist._type != TrackListType.PLAYLIST:
+            return False
+        if playlist.owner_id != _require_user_id(user):
+            raise ForbiddenError("User is not the owner of the playlist.")
+        return await self._uow.track_list_repo.delete_playlist_by_id(playlist_id)
+
+    async def add_tracks_to_playlist_bulk(
+        self,
+        user: UserSchema,
+        playlist_id: int,
+        track_ids: list[int],
+    ) -> PlaylistSchema:
+        playlist = await self._uow.track_list_repo.get_by_id(playlist_id)
+        if playlist is None or playlist._type != TrackListType.PLAYLIST:
+            raise NotFoundError("Playlist not found.")
+        if playlist.owner_id != _require_user_id(user):
+            raise ForbiddenError("User is not the owner of the playlist.")
+
+        tracks_to_add: list[Track] = []
+        for track_id in track_ids:
+            track = await self._uow.track_repo.get_by_id(track_id)
+            if track is None:
+                raise NotFoundError(f"Track not found: {track_id}")
+            playlist.add_track(track)
+            tracks_to_add.append(track)
+
+        playlist = await self._uow.track_list_repo.add_tracks(playlist, tracks_to_add)
+        return await TrackListMapper.playlist_entity_to_dto(playlist)
