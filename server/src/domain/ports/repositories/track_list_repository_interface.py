@@ -48,3 +48,7 @@ class TrackListRepositoryInterface(ABC):
     @abstractmethod
     async def delete_playlist_by_id(self, playlist_id: int) -> bool:
         raise NotImplementedError
+
+    @abstractmethod
+    async def set_track_order(self, track_list_id: int, ordered_track_ids: list[int]) -> None:
+        raise NotImplementedError

@@ -1,7 +1,7 @@
 from typing import Sequence
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, update
 from sqlalchemy.orm import selectinload
 
 from domain.ports.repositories.track_list_repository_interface import TrackListRepositoryInterface
@@ -101,3 +101,16 @@ class TrackListRepository(TrackListRepositoryInterface):
         await self._session.commit()
         rowcount = getattr(result, "rowcount", 0)
         return bool(rowcount)
+
+    async def set_track_order(self, track_list_id: int, ordered_track_ids: list[int]) -> None:
+        for idx, track_id in enumerate(ordered_track_ids, start=1):
+            stmt = (
+                update(tracks_track_lists)
+                .where(
+                    tracks_track_lists.c.track_list_id == track_list_id,
+                    tracks_track_lists.c.track_id == track_id,
+                )
+                .values(position=idx)
+            )
+            await self._session.execute(stmt)
+        await self._session.flush()

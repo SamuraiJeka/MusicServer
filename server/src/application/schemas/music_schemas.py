@@ -62,3 +62,7 @@ class PatchPlaylistSchema(BaseModel):
 
 class BulkAddTracksSchema(BaseModel):
     track_ids: list[PositiveInt]
+
+
+class OrderTracksSchema(BaseModel):
+    track_ids: list[PositiveInt]

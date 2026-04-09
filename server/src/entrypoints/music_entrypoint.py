@@ -21,6 +21,7 @@ from application.schemas.music_schemas import (
     PlaylistSummarySchema,
     PatchPlaylistSchema,
     BulkAddTracksSchema,
+    OrderTracksSchema,
     PostTrackSchema,
     TrackSchema,
 )
@@ -177,6 +178,24 @@ async def add_track_to_album(
         return await MusicService(uow).add_track_to_album(user, album_id, track_dto)
 
 
+@router.patch("/albums/{album_id}/order", response_model=AlbumSchema)
+async def set_album_track_order(
+    album_id: int,
+    dto: OrderTracksSchema,
+    user: UserSchema = Depends(get_authenticated_user),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> AlbumSchema:
+    async with uow:
+        try:
+            return await MusicService(uow).set_album_track_order(
+                user=user,
+                album_id=album_id,
+                ordered_track_ids=[int(tid) for tid in dto.track_ids],
+            )
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
+
+
 @router.delete("/albums/{album_id}/tracks/{track_id}")
 async def delete_track_from_album(
     album_id: int,
@@ -238,6 +257,24 @@ async def add_tracks_to_playlist_bulk(
                 user=user,
                 playlist_id=playlist_id,
                 track_ids=[int(tid) for tid in dto.track_ids],
+            )
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
+
+
+@router.patch("/playlists/{playlist_id}/order", response_model=PlaylistSchema)
+async def set_playlist_track_order(
+    playlist_id: int,
+    dto: OrderTracksSchema,
+    user: UserSchema = Depends(get_authenticated_user),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> PlaylistSchema:
+    async with uow:
+        try:
+            return await MusicService(uow).set_playlist_track_order(
+                user=user,
+                playlist_id=playlist_id,
+                ordered_track_ids=[int(tid) for tid in dto.track_ids],
             )
         except ApplicationError as e:
             raise HTTPException(status_code=e.status_code, detail=e.detail) from e

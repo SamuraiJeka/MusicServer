@@ -305,3 +305,54 @@ class MusicService:
 
         playlist = await self._uow.track_list_repo.add_tracks(playlist, tracks_to_add)
         return await TrackListMapper.playlist_entity_to_dto(playlist)
+
+    async def set_playlist_track_order(
+        self,
+        user: UserSchema,
+        playlist_id: int,
+        ordered_track_ids: list[int],
+    ) -> PlaylistSchema:
+        playlist = await self._uow.track_list_repo.get_by_id(playlist_id)
+        if playlist is None or playlist._type != TrackListType.PLAYLIST:
+            raise NotFoundError("Playlist not found.")
+        if playlist.owner_id != _require_user_id(user):
+            raise ForbiddenError("User is not the owner of the playlist.")
+
+        existing_ids = {t.id for t in playlist.track_list if t.id is not None}
+        if not ordered_track_ids:
+            raise BadRequestError("track_ids must not be empty")
+
+        if any(tid not in existing_ids for tid in ordered_track_ids):
+            raise BadRequestError("track_ids contains track not in playlist")
+
+        await self._uow.track_list_repo.set_track_order(playlist_id, ordered_track_ids)
+
+        playlist = await self._uow.track_list_repo.get_by_id(playlist_id)
+        if playlist is None:
+            raise NotFoundError("Playlist not found.")
+        return await TrackListMapper.playlist_entity_to_dto(playlist)
+
+    async def set_album_track_order(
+        self,
+        user: UserSchema,
+        album_id: int,
+        ordered_track_ids: list[int],
+    ) -> AlbumSchema:
+        album = await self._uow.track_list_repo.get_by_id(album_id)
+        if album is None or album._type != TrackListType.ALBUM:
+            raise NotFoundError("Album not found.")
+        if album.owner_id != _require_user_id(user):
+            raise ForbiddenError("User is not the owner of the album.")
+
+        existing_ids = {t.id for t in album.track_list if t.id is not None}
+        if not ordered_track_ids:
+            raise BadRequestError("track_ids must not be empty")
+        if any(tid not in existing_ids for tid in ordered_track_ids):
+            raise BadRequestError("track_ids contains track not in album")
+
+        await self._uow.track_list_repo.set_track_order(album_id, ordered_track_ids)
+
+        album = await self._uow.track_list_repo.get_by_id(album_id)
+        if album is None:
+            raise NotFoundError("Album not found.")
+        return await TrackListMapper.album_entity_to_dto(album)

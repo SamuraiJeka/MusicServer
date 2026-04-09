@@ -55,6 +55,7 @@ tracks_track_lists = Table(
     Column("id", BigInteger, primary_key=True, autoincrement=True),
     Column("track_id", ForeignKey("tracks.id")),
     Column("track_list_id", ForeignKey("track_lists.id")),
+    Column("position", BigInteger, nullable=True),
 )
 
 def start_mappers():
@@ -91,6 +92,10 @@ def start_mappers():
                 Track,
                 secondary=tracks_track_lists,
                 back_populates="lists",
+                order_by=(
+                    tracks_track_lists.c.position.asc().nulls_last(),
+                    tracks_track_lists.c.id.asc(),
+                ),
             ),
         },
     )
