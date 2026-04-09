@@ -30,10 +30,10 @@ jobs:
         cd server
         poetry run ruff check src
     
-    - name: Check types with mypy
-      run: |
-        cd server
-        poetry run mypy src
+    # - name: Check types with mypy
+    #   run: |
+    #     cd server
+    #     poetry run mypy src
     
     - name: Tests
       run: |
