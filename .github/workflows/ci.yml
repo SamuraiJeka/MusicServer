@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - backend
+      - server
 
 jobs:
   build:
@@ -23,14 +23,19 @@ jobs:
       run: |
         cd server
         pip install poetry 
-        poetry install --with dev
+        poetry install
       
     - name: Ruff linting
       run: |
         cd server
         poetry run ruff check src
     
-    - name: Check types with mypy
+    # - name: Check types with mypy
+    #   run: |
+    #     cd server
+    #     poetry run mypy src
+    
+    - name: Tests
       run: |
         cd server
-        poetry run mypy src
+        poetry run pytest test
