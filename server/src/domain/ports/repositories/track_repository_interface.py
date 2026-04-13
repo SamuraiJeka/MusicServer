@@ -23,5 +23,9 @@ class TrackRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def list_order_by_view_desc(self, limit: int) -> list[Track]:
+    async def list_order_by_view_desc(self, limit: int, offset: int = 0) -> list[Track]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def search_by_title(self, query: str, limit: int, offset: int = 0) -> list[Track]:
         raise NotImplementedError

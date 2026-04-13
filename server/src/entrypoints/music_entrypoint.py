@@ -22,6 +22,7 @@ from application.schemas.music_schemas import (
     PatchPlaylistSchema,
     BulkAddTracksSchema,
     OrderTracksSchema,
+    SearchResponseSchema,
     PostTrackSchema,
     TrackSchema,
 )
@@ -30,6 +31,19 @@ from application.exceptions import ApplicationError
 
 router = APIRouter(prefix="/music", tags=["music"])
 
+
+@router.get("/search", response_model=SearchResponseSchema)
+async def search(
+    q: str = Query(min_length=1, max_length=200),
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> SearchResponseSchema:
+    async with uow:
+        try:
+            return await MusicService(uow).search(query=q, limit=limit, offset=offset)
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
 
 @router.get("/albums", response_model=list[AlbumSummarySchema])
 async def list_albums(
@@ -148,10 +162,11 @@ async def list_my_playlists(
 @router.get("/tracks/popular", response_model=list[TrackSchema])
 async def list_popular_tracks(
     limit: int = Query(default=50, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
     uow: SqlAlchemyUnitOfWork = Depends(get_uow),
 ) -> list[TrackSchema]:
     async with uow:
-        return await MusicService(uow).list_popular_tracks(limit)
+        return await MusicService(uow).list_popular_tracks(limit, offset)
 
 
 @router.post("/albums", response_model=AlbumSchema)

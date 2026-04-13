@@ -66,3 +66,8 @@ class BulkAddTracksSchema(BaseModel):
 
 class OrderTracksSchema(BaseModel):
     track_ids: list[PositiveInt]
+
+
+class SearchResponseSchema(BaseModel):
+    albums: list[AlbumSummarySchema]
+    tracks: list[TrackSchema]

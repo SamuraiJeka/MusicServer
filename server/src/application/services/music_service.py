@@ -8,6 +8,7 @@ from application.schemas.music_schemas import (
     PlaylistSchema,
     PlaylistSummarySchema,
     TrackSchema,
+    SearchResponseSchema,
 )
 from application.schemas.user_schema import UserSchema
 from application.services.audio_metadata import get_mp3_duration
@@ -185,8 +186,8 @@ class MusicService:
         )
         return [TrackListMapper.playlist_entity_to_summary(p) for p in playlists]
 
-    async def list_popular_tracks(self, limit: int) -> list[TrackSchema]:
-        tracks = await self._uow.track_repo.list_order_by_view_desc(limit)
+    async def list_popular_tracks(self, limit: int, offset: int = 0) -> list[TrackSchema]:
+        tracks = await self._uow.track_repo.list_order_by_view_desc(limit, offset)
         return [await TrackMapper.entity_to_dto(t) for t in tracks]
 
     async def get_album(self, album_id: int) -> AlbumSummarySchema:
@@ -207,6 +208,14 @@ class MusicService:
             owner_id=owner_id,
         )
         return [TrackListMapper.album_entity_to_summary(a) for a in albums]
+
+    async def search(self, query: str, limit: int, offset: int = 0) -> SearchResponseSchema:
+        albums = await self._uow.track_list_repo.search_albums(query=query, limit=limit, offset=offset)
+        tracks = await self._uow.track_repo.search_by_title(query=query, limit=limit, offset=offset)
+        return SearchResponseSchema(
+            albums=[TrackListMapper.album_entity_to_summary(a) for a in albums],
+            tracks=[await TrackMapper.entity_to_dto(t) for t in tracks],
+        )
 
     async def patch_album(
         self,

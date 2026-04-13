@@ -60,6 +60,20 @@ class TrackListRepository(TrackListRepositoryInterface):
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
+    async def search_albums(self, query: str, limit: int, offset: int = 0) -> list[TrackList]:
+        stmt = (
+            select(TrackList)
+            .where(
+                TrackList._type == TrackListType.ALBUM,  # type: ignore[arg-type]
+                TrackList.title.ilike(f"%{query}%"),  # type: ignore[attr-defined]
+            )
+            .order_by(TrackList.id.desc())  # type: ignore[union-attr]
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
     async def add_tracks(self, track_list: TrackList, tracks: Sequence[Track]) -> TrackList:
         self._session.add(track_list)
         await self._session.flush()
