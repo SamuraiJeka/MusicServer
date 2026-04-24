@@ -46,6 +46,7 @@ track_lists = Table(
     Column("title", String(255), nullable=False),
     Column("owner_id", ForeignKey("users.id"), nullable=False),
     Column("_type", SAEnum(TrackListType, name="track_list_type"), nullable=False),
+    Column("image_filename", String(255), nullable=True),
 )
 
 

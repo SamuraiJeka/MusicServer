@@ -10,7 +10,8 @@ class UoWInterface(ABC):
     user_repo: UserRepositoryInterface
     track_list_repo: TrackListRepositoryInterface
     track_repo: TrackRepositoryInterface
-    storage: StorageInterface
+    audio_storage: StorageInterface
+    image_storage: StorageInterface
 
     @abstractmethod
     async def __aenter__(self):

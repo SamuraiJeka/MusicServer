@@ -25,6 +25,7 @@ class AlbumSchema(BaseModel):
     id: PositiveInt
     owner_id: PositiveInt
     title: str
+    image_filename: Optional[str] = None
     tracks: List[TrackSchema]
 
 
@@ -32,6 +33,7 @@ class AlbumSummarySchema(BaseModel):
     id: PositiveInt
     owner_id: PositiveInt
     title: str
+    image_filename: Optional[str] = None
 
 
 class PatchAlbumSchema(BaseModel):
@@ -47,6 +49,7 @@ class PlaylistSchema(BaseModel):
     id: PositiveInt
     owner_id: PositiveInt
     title: str
+    image_filename: Optional[str] = None
     tracks: List[TrackSchema]
 
 
@@ -54,6 +57,7 @@ class PlaylistSummarySchema(BaseModel):
     id: PositiveInt
     owner_id: PositiveInt
     title: str
+    image_filename: Optional[str] = None
 
 
 class PatchPlaylistSchema(BaseModel):

@@ -73,13 +73,66 @@ class MusicService:
         track_entity = await self._uow.track_repo.create(track_entity)
         album.add_track(track_entity)
 
-        await self._uow.storage.save(
+        await self._uow.audio_storage.save(
             str(owner_id),
             track_entity.title,
             track_entity.content,
         )
 
         return track_entity
+
+    def _image_prefix_for_list(self, owner_id: int, track_list: TrackList) -> str:
+        list_id = track_list.id
+        if list_id is None:
+            raise BadRequestError("TrackList must be persisted before saving image")
+        return f"{owner_id}/{track_list._type.value}/{list_id}"
+
+    async def add_track_list_image(
+        self,
+        user: UserSchema,
+        track_list_id: int,
+        content: bytes,
+        filename: str | None,
+        expected_type: TrackListType,
+    ) -> bool:
+        track_list = await self._uow.track_list_repo.get_by_id(track_list_id)
+        if track_list is None or track_list._type != expected_type:
+            raise NotFoundError("Track list does not exist.")
+        if track_list.owner_id != _require_user_id(user):
+            raise ForbiddenError("User is not the owner.")
+        if getattr(track_list, "image_filename", None):
+            raise BadRequestError("Image already exists. Use update endpoint.")
+
+        track_list.image_filename = filename or "image"
+        await self._uow.image_storage.save(
+            self._image_prefix_for_list(track_list.owner_id, track_list),
+            track_list.image_filename,
+            content,
+        )
+        return True
+
+    async def update_track_list_image(
+        self,
+        user: UserSchema,
+        track_list_id: int,
+        content: bytes,
+        filename: str | None,
+        expected_type: TrackListType,
+    ) -> bool:
+        track_list = await self._uow.track_list_repo.get_by_id(track_list_id)
+        if track_list is None or track_list._type != expected_type:
+            raise NotFoundError("Track list does not exist.")
+        if track_list.owner_id != _require_user_id(user):
+            raise ForbiddenError("User is not the owner.")
+
+        prefix = self._image_prefix_for_list(track_list.owner_id, track_list)
+        old_filename = getattr(track_list, "image_filename", None)
+        if old_filename:
+            await self._uow.image_storage.delete(prefix, old_filename)
+
+        track_list.image_filename = filename or "image"
+        await self._uow.image_storage.save(prefix, track_list.image_filename, content)
+        return True
 
     async def create_playlist(
         self,
@@ -230,7 +283,6 @@ class MusicService:
             raise ForbiddenError("User is not the owner of the album.")
 
         album.title = title
-        # TrackList уже в сессии, flush на выходе UoW зафиксирует изменения
         return TrackListMapper.album_entity_to_summary(album)
 
     async def remove_track_from_album(

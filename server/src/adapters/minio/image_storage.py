@@ -4,7 +4,7 @@ from domain.ports.storage_interface import StorageInterface
 from config.settings import settings
 
 
-class AudioStorage(StorageInterface):
+class ImageStorage(StorageInterface):
     def __init__(self):
         self._session = aioboto3.Session()
      
@@ -24,7 +24,7 @@ class AudioStorage(StorageInterface):
     ) -> None:
         async with await self._get_client() as client:
             await client.put_object(
-                Bucket=settings.MINIO_AUDIO_BUCKET,
+                Bucket=settings.MINIO_IMAGE_BUCKET,
                 Key=f"{prefix}/{filename}",
                 Body=content,
             )
@@ -38,6 +38,6 @@ class AudioStorage(StorageInterface):
             return
         async with await self._get_client() as client:
             await client.delete_object(
-                Bucket=settings.MINIO_AUDIO_BUCKET,
+                Bucket=settings.MINIO_IMAGE_BUCKET,
                 Key=f"{prefix}/{filename}",
             )

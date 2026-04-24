@@ -13,7 +13,8 @@ class Settings(BaseSettings):
     ACCESS_EXPIRES_MIN: int
     REFRESH_EXPIRES_DAY: int
     MINIO_ENDPOINT: str
-    MINIO_BUCKET: str
+    MINIO_AUDIO_BUCKET: str
+    MINIO_IMAGE_BUCKET: str
     MINIO_ACCESS_KEY: str
     MINIO_SECRET_KEY: str
 

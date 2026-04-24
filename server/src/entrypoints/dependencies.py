@@ -4,11 +4,9 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config.settings import settings
-from domain.ports.storage_interface import StorageInterface
 from domain.ports.uow_interface import UoWInterface
 from adapters.postgres.engine import get_session
 from adapters.postgres.sql_uow import SqlAlchemyUnitOfWork
-from adapters.minio.audio_storage import MinIOStorage
 from application.schemas.user_schema import UserSchema
 from application.services.user_service import UserService
 
@@ -18,10 +16,6 @@ async def get_uow(
     session: AsyncSession = Depends(get_session),
 ) -> UoWInterface:
     return SqlAlchemyUnitOfWork(session)
-
-
-async def get_storage() -> StorageInterface:
-    return MinIOStorage()
 
 
 async def get_authenticated_user(
