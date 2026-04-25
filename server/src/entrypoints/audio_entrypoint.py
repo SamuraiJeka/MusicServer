@@ -8,12 +8,26 @@ from application.schemas.music_schemas import (
     PlaylistSchema,
     PostTrackSchema,
     TrackSchema,
+    TrackAudioUrlSchema,
 )
 from application.schemas.user_schema import UserSchema
 from application.services.music_service import MusicService
 from entrypoints.dependencies import get_authenticated_user, get_uow
 
 router = APIRouter(prefix="/music", tags=["audio"])
+
+
+@router.get("/tracks/{track_id}/audio-url", response_model=TrackAudioUrlSchema)
+async def get_track_audio_url(
+    track_id: int,
+    user: UserSchema = Depends(get_authenticated_user),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> TrackAudioUrlSchema:
+    async with uow:
+        try:
+            return await MusicService(uow).get_track_audio_url(user=user, track_id=track_id)
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
 
 
 @router.get("/albums/{album_id}/tracks", response_model=list[TrackSchema])

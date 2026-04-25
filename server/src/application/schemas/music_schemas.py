@@ -18,6 +18,11 @@ class TrackSchema(BaseModel):
     view: int
 
 
+class TrackAudioUrlSchema(BaseModel):
+    url: str
+    expires_in: int = 3600
+
+
 class PostAlbumSchema(BaseModel):
     title: str
 

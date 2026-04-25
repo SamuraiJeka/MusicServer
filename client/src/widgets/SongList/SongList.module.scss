@@ -8,6 +8,14 @@
     border-color: white;
 }
 
+.loadError {
+    color: #ccc;
+    font-size: 12px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.25);
+}
+
 .title_list {
     text-align: left;
     font-size: larger;
@@ -34,11 +42,17 @@
 .element {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    width: 100%;
+    text-align: left;
+    border: none;
+    cursor: pointer;
     background-color: #363333;
     border-radius: 8px;
     padding: 10px;
     height: 40px;
     gap: 20px;
+    color: inherit;
 
     img {
         width: 50px;
@@ -68,4 +82,18 @@
         margin-top: auto;
         margin-bottom: 10px;
     }
+}
+
+.duration {
+    flex: 0 0 auto;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    font-size: 11px;
+    color: #ccc;
+    align-self: center;
+}
+
+.element:hover {
+    background-color: #3f3b3b;
 }
