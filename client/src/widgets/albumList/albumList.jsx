@@ -6,29 +6,29 @@ const AlbumList = ({title}) => {
 
     const [data, setData] = useState([
         {
-            img: "src/static/svagajpg.jpg",
-            title: "Я ебанутый фронт разраб dfdfdfdfdfdf",
-            artist: "я казах",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
         },
         {
-            img: "src/static/svagajpg.jpg",
-            title: "Я ебанутый фронт разраб",
-            artist: "я казах",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
         },
         {
-            img: "src/static/svagajpg.jpg",
-            title: "Я ебанутый фронт разраб",
-            artist: "я казах",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
         },
         {
-            img: "src/static/svagajpg.jpg",
-            title: "Я ебанутый",
-            artist: "я казах",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
         },
         {
-            img: "src/static/svagajpg.jpg",
-            title: "Я ебанутый фронт разраб",
-            artist: "ебаните меня топором",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
         }
     ])
 

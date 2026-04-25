@@ -17,6 +17,7 @@ from application.mappers.track_mapper import TrackMapper
 from domain.entities.track_list import TrackList, TrackListType
 from domain.entities.track import Track
 from application.exceptions import BadRequestError, ForbiddenError, NotFoundError
+from uuid import uuid4
 
 
 def _require_user_id(user: UserSchema) -> int:
@@ -63,19 +64,22 @@ class MusicService:
         if duration is None:
             raise BadRequestError("Could not read audio duration")
         owner_id = _require_user_id(user)
+        audio_key = f"tracks/{owner_id}/{uuid4().hex}.mp3"
+        prefix, filename = audio_key.rsplit("/", 1)
         track_entity: Track = await TrackMapper.dto_to_entity(
             owner_id=owner_id,
             title=track_dto.title,
             duration=duration,
             content=track_dto.content,
+            audio_key=audio_key,
         )
 
         track_entity = await self._uow.track_repo.create(track_entity)
         album.add_track(track_entity)
 
         await self._uow.audio_storage.save(
-            str(owner_id),
-            track_entity.title,
+            prefix,
+            filename,
             track_entity.content,
         )
 

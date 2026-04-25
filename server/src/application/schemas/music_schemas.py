@@ -13,6 +13,7 @@ class TrackSchema(BaseModel):
     id: PositiveInt
     owner_id: PositiveInt
     title: str
+    audio_key: Optional[str] = None
     duration: timedelta
     view: int
 

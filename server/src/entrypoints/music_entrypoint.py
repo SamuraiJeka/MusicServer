@@ -211,5 +211,3 @@ async def delete_playlist(
             return await MusicService(uow).delete_playlist(user=user, playlist_id=playlist_id)
         except ApplicationError as e:
             raise HTTPException(status_code=e.status_code, detail=e.detail) from e
-
-

@@ -6,51 +6,51 @@ const SongList = () => {
 
     const [data, setData] = useState([
         {
-            img: "src/static/svagajpg.jpg",
-            title: "весенний лес",
-            artist: "оксимирон",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
             is_like: false,
             timedelta: "3:10"
         },
         {
-            img: "src/static/svagajpg.jpg",
-            title: "весенний лес",
-            artist: "оксимирон",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
             is_like: false,
             timedelta: "3:10"
         },
         {
-            img: "src/static/svagajpg.jpg",
-            title: "весенний лес",
-            artist: "оксимирон",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
             is_like: false,
             timedelta: "3:10"
         },
         {
-            img: "src/static/svagajpg.jpg",
-            title: "весенний лес",
-            artist: "оксимирон",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
             is_like: false,
             timedelta: "3:10"
         },
         {
-            img: "src/static/svagajpg.jpg",
-            title: "весенний лес",
-            artist: "оксимирон",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
             is_like: false,
             timedelta: "3:10"
         },
         {
-            img: "src/static/svagajpg.jpg",
-            title: "весенний лес",
-            artist: "оксимирон",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
             is_like: false,
             timedelta: "3:10"
         },
         {
-            img: "src/static/svagajpg.jpg",
-            title: "весенний лес",
-            artist: "оксимирон",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
             is_like: false,
             timedelta: "3:10"
         },

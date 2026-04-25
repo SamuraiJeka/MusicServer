@@ -12,12 +12,14 @@ class TrackMapper:
         title: str,
         duration: timedelta,
         content: bytes,
+        audio_key: str | None = None,
         view: int = 0,
     ) -> Track:
         return Track(
             id=None,
             owner_id=owner_id,
             title=title,
+            audio_key=audio_key,
             view=view,
             duration=duration,
             content=content,
@@ -31,6 +33,7 @@ class TrackMapper:
             id=entity.id,
             owner_id=entity.owner_id,
             title=entity.title,
+            audio_key=getattr(entity, "audio_key", None),
             duration=entity.duration,
             view=entity.view,
         )

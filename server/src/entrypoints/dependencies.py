@@ -1,5 +1,5 @@
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, WebSocket
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -51,3 +51,25 @@ async def get_authenticated_user(
         raise expired_token_exception
     except jwt.exceptions.PyJWTError:
         raise credentials_exception
+
+
+async def get_ws_authenticated_user(
+    websocket: WebSocket,
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> UserSchema:
+    token = websocket.query_params.get("token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing token")
+
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        if payload.get("type") != "access":
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token type")
+        email = payload.get("email")
+        if not email:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
+        return await UserService(uow).get_by_email(email)
+    except jwt.exceptions.ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
+    except jwt.exceptions.PyJWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
