@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import styles from "./AppLayout.module.scss";
 import { useAuth } from "../../shared/auth/AuthContext";
+import SearchBar from "../../shared/search/SearchBar";
 
 export default function AppLayout() {
   const auth = useAuth();
@@ -25,13 +26,16 @@ export default function AppLayout() {
             >
               Моя медиатека
             </NavLink>
-            <button type="button" className={styles.navButton} disabled title="Скоро">
+            <NavLink
+              to="/chats"
+              className={({ isActive }) => `${styles.navLink} ${isActive ? styles.navLinkActive : ""}`}
+            >
               Чаты
-            </button>
+            </NavLink>
           </nav>
           <nav className={styles.navBottom}>
             <NavLink
-              to="/profile"
+              to="/artist"
               className={({ isActive }) => `${styles.navLink} ${isActive ? styles.navLinkActive : ""}`}
             >
               Моя карточка
@@ -49,7 +53,14 @@ export default function AppLayout() {
         </div>
       </aside>
       <main className={styles.main}>
-        <Outlet />
+        <div className={styles.topbar}>
+          <div className={styles.topbarInner}>
+            <SearchBar />
+          </div>
+        </div>
+        <div className={styles.mainInner}>
+          <Outlet />
+        </div>
       </main>
     </div>
   );

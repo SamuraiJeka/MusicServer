@@ -114,3 +114,21 @@
   min-height: 100vh;
   box-sizing: border-box;
 }
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: rgba(38, 36, 36, 0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+.topbarInner {
+  padding: 14px 24px;
+  box-sizing: border-box;
+}
+
+.mainInner {
+  min-height: calc(100vh - 64px);
+}

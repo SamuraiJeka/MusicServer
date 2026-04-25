@@ -6,6 +6,7 @@ import ProfilePage from "../../pages/ProfilePage/ProfilePage"
 import CreateAlbumPage from "../../pages/CreateAlbumPage/CreateAlbumPage"
 import MyLibraryPage from "../../pages/MyLibraryPage/MyLibraryPage"
 import CreatePlaylistPage from "../../pages/CreatePlaylistPage/CreatePlaylistPage"
+import ChatsPage from "../../pages/ChatsPage/ChatsPage"
 import AppLayout from "../layout/AppLayout"
 import RequireAuth from "../../shared/auth/RequireAuth"
 
@@ -43,6 +44,10 @@ const router = createBrowserRouter(
                 {
                     path: "create-playlist",
                     element: <CreatePlaylistPage />,
+                },
+                {
+                    path: "chats",
+                    element: <ChatsPage />,
                 },
             ],
         },
