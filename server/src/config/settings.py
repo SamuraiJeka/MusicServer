@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     MINIO_IMAGE_BUCKET: str
     MINIO_ACCESS_KEY: str
     MINIO_SECRET_KEY: str
+    FRONTEND_URL: str
 
     @property
     def postgres_url(self):
