@@ -2,7 +2,7 @@ import { useState } from "react";
 import styles from "./ArtistList.module.scss"
 
 
-const AlbumList = ({title}) => {
+const ArtistList = ({title}) => {
 
     const [data, setData] = useState([
         {
@@ -40,7 +40,7 @@ const AlbumList = ({title}) => {
                 {
                     data.map((el) => {
                         return (
-                        <div className={styles.element}>
+                        <div className={styles.element} key={`${el.artist}-${Math.random()}`}>
                             <img src={el.img} alt="" />
                             <div>
                                 <span>{el.artist}</span>
@@ -54,4 +54,4 @@ const AlbumList = ({title}) => {
 };
 
 
-export default AlbumList;
+export default ArtistList;

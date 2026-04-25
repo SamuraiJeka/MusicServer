@@ -2,13 +2,18 @@ import { createBrowserRouter } from "react-router-dom"
 import MainPage from "../../pages/MainPage/MainPage"
 import AuthPage from "../../pages/AuthPage/AuthPage"
 import ArtistPage from "../../pages/ArtistPage/ArtistPage"
+import RequireAuth from "../../shared/auth/RequireAuth"
 
 
 const router = createBrowserRouter(
     [
         {
             path: "/",
-            element: <MainPage/>,
+            element: (
+                <RequireAuth>
+                    <MainPage/>
+                </RequireAuth>
+            ),
             // errorElement: <App/>,
         },
         {
@@ -17,7 +22,11 @@ const router = createBrowserRouter(
         },
         {
             path: "/artist",
-            element: <ArtistPage/>,
+            element: (
+                <RequireAuth>
+                    <ArtistPage/>
+                </RequireAuth>
+            ),
         },
     ]
 )

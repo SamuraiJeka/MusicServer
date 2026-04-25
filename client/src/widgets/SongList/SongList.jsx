@@ -65,7 +65,7 @@ const SongList = () => {
                 {
                     data.map((el) => {
                         return (
-                        <div className={styles.element}>
+                        <div className={styles.element} key={`${el.title}-${el.artist}-${Math.random()}`}>
                             <img src={el.img} alt="" />
                             <div>
                                 <p>{el.title}</p>

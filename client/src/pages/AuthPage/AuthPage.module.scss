@@ -14,7 +14,6 @@
   max-width: 1200px;
   height: 500px;
   aspect-ratio: 16 / 9;
-  margin: 120px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -22,9 +21,9 @@
   background: #063553;
   border-radius: 8px;
   color: white;
-  gap: 100px;
+  gap: 60px;
   padding: 40px;
-  margin: 2vh
+  margin: 2vh;
 }
 
 .main_text {
@@ -54,6 +53,30 @@
   flex-direction: column;
   align-items: center;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+}
+
+.error {
+  width: 100%;
+  font-size: 12px;
+  line-height: 1.2;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  white-space: pre-line;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 4px;
+}
+
+.fieldError {
+  font-size: 11px;
+  line-height: 1.2;
+  padding-left: 2px;
 }
 
 .tabs {
@@ -127,4 +150,9 @@ input::placeholder {
 
 .submit_btn:hover {
   background-color: #0052ab;
+}
+
+.submit_btn:disabled {
+  opacity: 0.7;
+  cursor: default;
 }
