@@ -5,8 +5,13 @@
     justify-content: center;
     display: flex;
     flex-direction: column;
+    padding: 30px 0;
 }
 
 .main_container {
     width: 80%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
 }

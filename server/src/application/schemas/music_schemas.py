@@ -13,8 +13,14 @@ class TrackSchema(BaseModel):
     id: PositiveInt
     owner_id: PositiveInt
     title: str
+    audio_key: Optional[str] = None
     duration: timedelta
     view: int
+
+
+class TrackAudioUrlSchema(BaseModel):
+    url: str
+    expires_in: int = 3600
 
 
 class PostAlbumSchema(BaseModel):
@@ -25,6 +31,7 @@ class AlbumSchema(BaseModel):
     id: PositiveInt
     owner_id: PositiveInt
     title: str
+    image_filename: Optional[str] = None
     tracks: List[TrackSchema]
 
 
@@ -32,6 +39,7 @@ class AlbumSummarySchema(BaseModel):
     id: PositiveInt
     owner_id: PositiveInt
     title: str
+    image_filename: Optional[str] = None
 
 
 class PatchAlbumSchema(BaseModel):
@@ -47,6 +55,7 @@ class PlaylistSchema(BaseModel):
     id: PositiveInt
     owner_id: PositiveInt
     title: str
+    image_filename: Optional[str] = None
     tracks: List[TrackSchema]
 
 
@@ -54,6 +63,7 @@ class PlaylistSummarySchema(BaseModel):
     id: PositiveInt
     owner_id: PositiveInt
     title: str
+    image_filename: Optional[str] = None
 
 
 class PatchPlaylistSchema(BaseModel):
@@ -66,3 +76,8 @@ class BulkAddTracksSchema(BaseModel):
 
 class OrderTracksSchema(BaseModel):
     track_ids: list[PositiveInt]
+
+
+class SearchResponseSchema(BaseModel):
+    albums: list[AlbumSummarySchema]
+    tracks: list[TrackSchema]

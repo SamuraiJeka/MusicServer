@@ -36,7 +36,23 @@ class TrackRepository(TrackRepositoryInterface):
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def list_order_by_view_desc(self, limit: int) -> list[Track]:
-        stmt = select(Track).order_by(Track.view.desc()).limit(limit)  # type: ignore[attr-defined]
+    async def list_order_by_view_desc(self, limit: int, offset: int = 0) -> list[Track]:
+        stmt = (
+            select(Track)
+            .order_by(Track.view.desc())  # type: ignore[attr-defined]
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def search_by_title(self, query: str, limit: int, offset: int = 0) -> list[Track]:
+        stmt = (
+            select(Track)
+            .where(Track.title.ilike(f"%{query}%"))  # type: ignore[attr-defined]
+            .order_by(Track.view.desc())  # type: ignore[attr-defined]
+            .limit(limit)
+            .offset(offset)
+        )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())

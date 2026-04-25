@@ -7,5 +7,5 @@ class StorageInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def delete(self, prefix: str, filename: str,) -> None:
+    async def delete(self, prefix: str, filename: str | None) -> None:
         raise NotImplementedError

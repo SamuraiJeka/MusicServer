@@ -30,6 +30,10 @@ class TrackListRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def search_albums(self, query: str, limit: int, offset: int = 0) -> list[TrackList]:
+        raise NotImplementedError
+
+    @abstractmethod
     async def add_tracks(self, track_list: TrackList, tracks: Sequence[Track]) -> TrackList:
         raise NotImplementedError
 

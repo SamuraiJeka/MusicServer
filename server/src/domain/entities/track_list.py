@@ -15,12 +15,14 @@ class TrackList:
         id: int | None,
         owner_id: int,
         title: str,
-        _type: TrackListType
+        _type: TrackListType,
+        image_filename: str | None = None,
         ):
         self.id = id
         self.owner_id = owner_id
         self.title = title
         self._type = _type
+        self.image_filename = image_filename
         self.track_list: list[Track] = []
 
     def __repr__(self):

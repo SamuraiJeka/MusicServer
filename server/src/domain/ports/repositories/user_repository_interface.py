@@ -23,3 +23,7 @@ class UserRepositoryInterface(ABC):
     @abstractmethod
     async def delete_by_id(self, user_id: int) -> bool:
         raise NotImplementedError
+
+    @abstractmethod
+    async def search(self, query: str, limit: int, offset: int = 0) -> list[User]:
+        raise NotImplementedError

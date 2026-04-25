@@ -6,29 +6,29 @@ const AlbumList = ({title}) => {
 
     const [data, setData] = useState([
         {
-            img: "src/static/svagajpg.jpg",
-            title: "Я ебанутый фронт разраб dfdfdfdfdfdf",
-            artist: "я казах",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
         },
         {
-            img: "src/static/svagajpg.jpg",
-            title: "Я ебанутый фронт разраб",
-            artist: "я казах",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
         },
         {
-            img: "src/static/svagajpg.jpg",
-            title: "Я ебанутый фронт разраб",
-            artist: "я казах",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
         },
         {
-            img: "src/static/svagajpg.jpg",
-            title: "Я ебанутый",
-            artist: "я казах",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
         },
         {
-            img: "src/static/svagajpg.jpg",
-            title: "Я ебанутый фронт разраб",
-            artist: "ебаните меня топором",
+            img: "src/static/picture.png",
+            title: "Test",
+            artist: "Test",
         }
     ])
 
@@ -44,7 +44,7 @@ const AlbumList = ({title}) => {
                 {
                     data.map((el) => {
                         return (
-                        <div className={styles.element}>
+                        <div className={styles.element} key={`${el.title}-${el.artist}-${Math.random()}`}>
                             <img src={el.img} alt="" />
                             <div>
                                 <p>{el.title}</p>
