@@ -86,6 +86,53 @@
   cursor: not-allowed;
 }
 
+.changePhotoBtn {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 4px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  text-align: left;
+  color: #e0e0e0;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: background-color 0.15s linear, color 0.15s linear;
+}
+
+.changePhotoBtn:hover:not(:disabled) {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.changePhotoBtn:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.avatarError {
+  margin: 6px 0 0;
+  padding: 0 4px;
+  font-size: 12px;
+  color: #ffb4b4;
+  line-height: 1.3;
+}
+
+.hiddenFileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .logoutBtn {
   display: block;
   width: 100%;

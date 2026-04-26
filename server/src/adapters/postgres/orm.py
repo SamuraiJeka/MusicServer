@@ -33,6 +33,7 @@ users = Table(
     Column("email", String(255), unique=True, nullable=False),
     Column("username", String(32), nullable=False),
     Column("hash_password", String(255), nullable=False),
+    Column("avatar_key", String(512), nullable=True),
 )
 
 

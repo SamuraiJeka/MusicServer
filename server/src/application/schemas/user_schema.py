@@ -11,3 +11,10 @@ class UserSchema(BaseModel):
     id: int | None
     username: str
     email: EmailStr
+
+
+class UserMeSchema(BaseModel):
+    id: int
+    username: str
+    email: EmailStr
+    avatar_url: str | None = None

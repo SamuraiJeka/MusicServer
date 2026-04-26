@@ -9,7 +9,7 @@ async def presign_track_audio(key: str, expires_in: int = 3600) -> str:
     session = aioboto3.Session()
     async with session.client(
         service_name="s3",
-        endpoint_url=settings.MINIO_ENDPOINT,
+        endpoint_url=settings.MINIO_PUBLIC_ENDPOINT or settings.MINIO_ENDPOINT,
         aws_access_key_id=settings.MINIO_ACCESS_KEY,
         aws_secret_access_key=settings.MINIO_SECRET_KEY,
     ) as client:

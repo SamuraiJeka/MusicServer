@@ -7,3 +7,4 @@ class User:
     hash_password: str
     username: str
     id: int | None = None
+    avatar_key: str | None = None

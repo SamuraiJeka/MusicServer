@@ -5,7 +5,7 @@ import aioboto3  # type: ignore
 from config.settings import settings
 
 
-async def presign_chat_audio(key: str, expires_in: int = 3600) -> str:
+async def presign_user_avatar(key: str, expires_in: int = 3600) -> str:
     session = aioboto3.Session()
     async with session.client(
         service_name="s3",
@@ -15,6 +15,6 @@ async def presign_chat_audio(key: str, expires_in: int = 3600) -> str:
     ) as client:
         return await client.generate_presigned_url(
             ClientMethod="get_object",
-            Params={"Bucket": settings.MINIO_AUDIO_BUCKET, "Key": key},
+            Params={"Bucket": settings.MINIO_IMAGE_BUCKET, "Key": key},
             ExpiresIn=expires_in,
         )
