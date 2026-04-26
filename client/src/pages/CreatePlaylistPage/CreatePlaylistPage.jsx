@@ -1,15 +1,29 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "../ProfilePage/PlaceholderPage.module.scss";
+import styles from "./CreatePlaylistPage.module.scss";
 import { http } from "../../shared/api/http";
 
 export default function CreatePlaylistPage() {
+  const coverInputRef = useRef(null);
   const [title, setTitle] = useState("");
+  const [coverFile, setCoverFile] = useState(null);
+  const [coverPreviewUrl, setCoverPreviewUrl] = useState(null);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const trimmed = useMemo(() => title.trim(), [title]);
+
+  const pickCover = () => coverInputRef.current?.click();
+
+  const onCoverChange = (e) => {
+    const f = e.target.files?.[0] || null;
+    e.target.value = "";
+    setError(null);
+    setCoverFile(f);
+    if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+    setCoverPreviewUrl(f ? URL.createObjectURL(f) : null);
+  };
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +34,15 @@ export default function CreatePlaylistPage() {
     }
     setIsSubmitting(true);
     try {
-      await http.post("/music/playlists", { title: trimmed });
+      const resp = await http.post("/music/playlists", { title: trimmed });
+      const playlistId = resp.data?.id;
+      if (!playlistId) throw new Error("Missing playlist id");
+
+      if (coverFile) {
+        const fd = new FormData();
+        fd.append("file", coverFile);
+        await http.post(`/music/playlists/${playlistId}/image`, fd);
+      }
       navigate("/library", { replace: true });
     } catch (err) {
       setError(err?.response?.data?.detail || "Ошибка создания плейлиста");
@@ -33,41 +55,46 @@ export default function CreatePlaylistPage() {
     <div className={styles.wrapper}>
       <div className={styles.card}>
         <h1 className={styles.title}>Создать плейлист</h1>
-        <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <input
+        <form className={styles.form} onSubmit={onSubmit}>
+          <div>
+            <div className={styles.label}>Название</div>
+            <input
+              className={styles.input}
             value={title}
             onChange={(e) => {
               setTitle(e.target.value);
               setError(null);
             }}
             placeholder="Название плейлиста"
-            style={{
-              height: 40,
-              paddingLeft: 12,
-              borderRadius: 10,
-              border: "none",
-              outline: "none",
-              backgroundColor: "#014861",
-              color: "white",
-              fontSize: 14,
-            }}
-          />
-          {error ? <div className={styles.text} style={{ color: "#fff" }}>{error}</div> : null}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            style={{
-              backgroundColor: "#007BFF",
-              border: "none",
-              padding: "10px 14px",
-              borderRadius: 10,
-              fontWeight: 800,
-              color: "white",
-              cursor: isSubmitting ? "default" : "pointer",
-              opacity: isSubmitting ? 0.7 : 1,
-            }}
-          >
-            {isSubmitting ? "..." : "Создать"}
+              disabled={isSubmitting}
+            />
+          </div>
+
+          <div>
+            <div className={styles.label}>Фотография плейлиста (необязательно)</div>
+            <div className={styles.coverRow}>
+              <div className={styles.coverPreview} aria-label="Превью обложки">
+                {coverPreviewUrl ? <img src={coverPreviewUrl} alt="" /> : null}
+              </div>
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className={styles.hiddenFileInput}
+                onChange={onCoverChange}
+                disabled={isSubmitting}
+              />
+              <button type="button" className={styles.fileBtn} onClick={pickCover} disabled={isSubmitting}>
+                Выбрать фото
+              </button>
+              {coverFile ? <p className={styles.hint}>{coverFile.name}</p> : null}
+            </div>
+          </div>
+
+          {error ? <p className={styles.error}>{error}</p> : null}
+
+          <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+            {isSubmitting ? "Создаём…" : "Создать"}
           </button>
         </form>
       </div>
