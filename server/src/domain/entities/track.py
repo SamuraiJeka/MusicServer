@@ -11,3 +11,4 @@ class Track:
     view: int
     duration: timedelta
     content: bytes
+    created_album_id: int | None = None

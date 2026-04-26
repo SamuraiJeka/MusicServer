@@ -1,12 +1,13 @@
 from typing import Sequence
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete, update
+from sqlalchemy import select, delete, update, func
 from sqlalchemy.orm import selectinload
 
 from domain.ports.repositories.track_list_repository_interface import TrackListRepositoryInterface
 from domain.entities.track_list import TrackList, TrackListType
 from domain.entities.track import Track
+from adapters.postgres.orm import tracks
 from adapters.postgres.orm import tracks_track_lists
 
 
@@ -68,6 +69,23 @@ class TrackListRepository(TrackListRepositoryInterface):
                 TrackList.title.ilike(f"%{query}%"),  # type: ignore[attr-defined]
             )
             .order_by(TrackList.id.desc())  # type: ignore[union-attr]
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def list_popular_albums(self, limit: int, offset: int = 0) -> list[TrackList]:
+        # Popularity: sum of track.view for tracks linked to the album.
+        views_sum = func.coalesce(func.sum(tracks.c.view), 0).label("views_sum")
+        stmt = (
+            select(TrackList)
+            .select_from(TrackList)
+            .join(tracks_track_lists, tracks_track_lists.c.track_list_id == TrackList.id, isouter=True)
+            .join(tracks, tracks.c.id == tracks_track_lists.c.track_id, isouter=True)
+            .where(TrackList._type == TrackListType.ALBUM)  # type: ignore[arg-type]
+            .group_by(TrackList.id)
+            .order_by(views_sum.desc(), TrackList.id.desc())  # type: ignore[union-attr]
             .limit(limit)
             .offset(offset)
         )

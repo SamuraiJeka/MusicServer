@@ -14,6 +14,7 @@ class TrackMapper:
         content: bytes,
         audio_key: str | None = None,
         view: int = 0,
+        created_album_id: int | None = None,
     ) -> Track:
         return Track(
             id=None,
@@ -23,6 +24,7 @@ class TrackMapper:
             view=view,
             duration=duration,
             content=content,
+            created_album_id=created_album_id,
         )
 
     @staticmethod
@@ -34,6 +36,7 @@ class TrackMapper:
             owner_id=entity.owner_id,
             title=entity.title,
             audio_key=getattr(entity, "audio_key", None),
+            created_album_id=getattr(entity, "created_album_id", None),
             duration=entity.duration,
             view=entity.view,
         )

@@ -15,6 +15,24 @@
     gap: 50px;
 }
 
+.sectionTitle {
+    color: #fff;
+    font-size: 20px;
+    font-family: "Ruslan Display", "Comfortaa", sans-serif;
+    margin: 0;
+}
+
+.sectionTitle span {
+    color: #007BFF;
+    font-family: "Ruslan Display", "Comfortaa", sans-serif;
+}
+
+.tracks {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .preview_background {
     position: relative;
     width: 100%;

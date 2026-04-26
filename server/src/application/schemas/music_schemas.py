@@ -1,4 +1,5 @@
 from datetime import timedelta
+from datetime import datetime
 from typing import Optional, List
 
 from pydantic import BaseModel, PositiveInt, Field
@@ -14,11 +15,17 @@ class TrackSchema(BaseModel):
     owner_id: PositiveInt
     title: str
     audio_key: Optional[str] = None
+    created_album_id: Optional[PositiveInt] = None
     duration: timedelta
     view: int
 
 
 class TrackAudioUrlSchema(BaseModel):
+    url: str
+    expires_in: int = 3600
+
+
+class ImageUrlSchema(BaseModel):
     url: str
     expires_in: int = 3600
 
@@ -32,6 +39,7 @@ class AlbumSchema(BaseModel):
     owner_id: PositiveInt
     title: str
     image_filename: Optional[str] = None
+    created_at: datetime
     tracks: List[TrackSchema]
 
 
@@ -40,6 +48,7 @@ class AlbumSummarySchema(BaseModel):
     owner_id: PositiveInt
     title: str
     image_filename: Optional[str] = None
+    created_at: datetime
 
 
 class PatchAlbumSchema(BaseModel):
@@ -56,6 +65,7 @@ class PlaylistSchema(BaseModel):
     owner_id: PositiveInt
     title: str
     image_filename: Optional[str] = None
+    created_at: datetime
     tracks: List[TrackSchema]
 
 
@@ -64,6 +74,7 @@ class PlaylistSummarySchema(BaseModel):
     owner_id: PositiveInt
     title: str
     image_filename: Optional[str] = None
+    created_at: datetime
 
 
 class PatchPlaylistSchema(BaseModel):

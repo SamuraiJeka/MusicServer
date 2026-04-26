@@ -9,6 +9,7 @@ from application.schemas.music_schemas import (
     PlaylistSummarySchema,
     TrackSchema,
     TrackAudioUrlSchema,
+    ImageUrlSchema,
     SearchResponseSchema,
 )
 from application.schemas.user_schema import UserSchema
@@ -19,6 +20,7 @@ from domain.entities.track_list import TrackList, TrackListType
 from domain.entities.track import Track
 from application.exceptions import BadRequestError, ForbiddenError, NotFoundError
 from application.services.track_audio_presign import presign_track_audio
+from application.services.track_list_image_presign import presign_track_list_image
 from uuid import uuid4
 
 
@@ -68,6 +70,7 @@ class MusicService:
             duration=duration,
             content=track_dto.content,
             audio_key=audio_key,
+            created_album_id=album.id,
         )
 
         track_entity = await self._uow.track_repo.create(track_entity)
@@ -86,6 +89,32 @@ class MusicService:
         if list_id is None:
             raise BadRequestError("TrackList must be persisted before saving image")
         return f"{owner_id}/{track_list._type.value}/{list_id}"
+
+    async def get_album_image_url(self, user: UserSchema, album_id: int) -> ImageUrlSchema:
+        self._require_user_id(user)
+        album = await self._uow.track_list_repo.get_by_id(album_id)
+        if album is None or album._type != TrackListType.ALBUM:
+            raise NotFoundError("Album not found.")
+        if not getattr(album, "image_filename", None):
+            raise NotFoundError("Album image not found.")
+        prefix = self._image_prefix_for_list(album.owner_id, album)
+        key = f"{prefix}/{album.image_filename}"
+        expires_in = 3600
+        url = await presign_track_list_image(key, expires_in=expires_in)
+        return ImageUrlSchema(url=url, expires_in=expires_in)
+
+    async def get_playlist_image_url(self, user: UserSchema, playlist_id: int) -> ImageUrlSchema:
+        self._require_user_id(user)
+        playlist = await self._uow.track_list_repo.get_by_id(playlist_id)
+        if playlist is None or playlist._type != TrackListType.PLAYLIST:
+            raise NotFoundError("Playlist not found.")
+        if not getattr(playlist, "image_filename", None):
+            raise NotFoundError("Playlist image not found.")
+        prefix = self._image_prefix_for_list(playlist.owner_id, playlist)
+        key = f"{prefix}/{playlist.image_filename}"
+        expires_in = 3600
+        url = await presign_track_list_image(key, expires_in=expires_in)
+        return ImageUrlSchema(url=url, expires_in=expires_in)
 
     async def add_track_list_image(
         self,
@@ -271,6 +300,10 @@ class MusicService:
             offset=offset,
             owner_id=owner_id,
         )
+        return [TrackListMapper.album_entity_to_summary(a) for a in albums]
+
+    async def list_popular_albums(self, limit: int, offset: int = 0) -> list[AlbumSummarySchema]:
+        albums = await self._uow.track_list_repo.list_popular_albums(limit=limit, offset=offset)
         return [TrackListMapper.album_entity_to_summary(a) for a in albums]
 
     async def search(self, query: str, limit: int, offset: int = 0) -> SearchResponseSchema:

@@ -1,13 +1,21 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./ArtistPage.module.scss";
 
 import SongList from "../../widgets/SongList/SongList";
-import AlbumList from "../../widgets/AlbumList/AlbumList";
-import ArtisList from "../../widgets/ArtistList/ArtistList";
+import MediaGrid from "../../widgets/MediaGrid/MediaGrid";
 import { http } from "../../shared/api/http";
+import TrackRow from "../../widgets/TrackRow/TrackRow";
+import { useAudioPlayer } from "../../shared/player/AudioPlayerContext";
 
 const ArtistPage = () => {
   const [profile, setProfile] = useState({ username: "…", avatar_url: null });
+  const [albums, setAlbums] = useState([]);
+  const [albumsLoading, setAlbumsLoading] = useState(true);
+  const [topTracks, setTopTracks] = useState([]);
+  const [tracksLoading, setTracksLoading] = useState(true);
+  const navigate = useNavigate();
+  const player = useAudioPlayer();
 
   const loadProfile = useCallback(async () => {
     try {
@@ -21,9 +29,71 @@ const ArtistPage = () => {
     }
   }, []);
 
+  const loadAlbums = useCallback(async () => {
+    setAlbumsLoading(true);
+    try {
+      const { data } = await http.get("/music/me/albums");
+      const raw = data || [];
+      const withCovers = await Promise.all(
+        raw.map(async (al) => {
+          if (!al?.image_filename) return al;
+          try {
+            const resp = await http.get(`/music/albums/${al.id}/image-url`);
+            return { ...al, image_url: resp.data?.url || null };
+          } catch {
+            return { ...al, image_url: null };
+          }
+        })
+      );
+      setAlbums(withCovers);
+    } catch {
+      setAlbums([]);
+    } finally {
+      setAlbumsLoading(false);
+    }
+  }, []);
+
+  const loadTopTracks = useCallback(async () => {
+    setTracksLoading(true);
+    try {
+      const { data } = await http.get("/music/me/tracks", { params: { limit: 20 } });
+      const raw = data || [];
+      const coverCache = new Map();
+      const withCovers = await Promise.all(
+        raw.map(async (tr) => {
+          const albumId = tr?.created_album_id;
+          if (!albumId) return { ...tr, cover_url: null };
+          if (coverCache.has(albumId)) return { ...tr, cover_url: coverCache.get(albumId) };
+          try {
+            const resp = await http.get(`/music/albums/${albumId}/image-url`);
+            const url = resp.data?.url || null;
+            coverCache.set(albumId, url);
+            return { ...tr, cover_url: url };
+          } catch {
+            coverCache.set(albumId, null);
+            return { ...tr, cover_url: null };
+          }
+        })
+      );
+      setTopTracks(withCovers);
+    } catch {
+      setTopTracks([]);
+    } finally {
+      setTracksLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadProfile();
   }, [loadProfile]);
+
+  useEffect(() => {
+    loadAlbums();
+  }, [loadAlbums]);
+
+  useEffect(() => {
+    loadTopTracks();
+  }, [loadTopTracks]);
 
   useEffect(() => {
     const onAvatar = () => loadProfile();
@@ -42,10 +112,37 @@ const ArtistPage = () => {
             <h1>{profile.username}</h1>
           </div>
         </div>
+        <h2 className={styles.sectionTitle}>
+          Треки <span>по прослушиваниям</span>
+        </h2>
+        <div className={styles.tracks}>
+          {tracksLoading ? <div style={{ color: "#ccc" }}>Загрузка…</div> : null}
+          {!tracksLoading && topTracks.length === 0 ? <div style={{ color: "#ccc" }}>Пока нет треков.</div> : null}
+          {topTracks.map((tr, idx) => (
+            <TrackRow
+              key={String(tr.id)}
+              index={idx + 1}
+              trackId={tr.id}
+              title={tr.title}
+              author={profile.username}
+              duration={tr.duration}
+              coverSrc={tr.cover_url || "src/static/picture.png"}
+              onClick={() => player.playQueue(topTracks, idx)}
+            />
+          ))}
+        </div>
+
         <SongList />
-        <AlbumList title={<h1>Альбомы <span>артиста</span></h1>} />
-        <AlbumList title={<h1>Мини-альбомы и <span>синглы</span></h1>} />
-        <ArtisList title={<h1>Связанные <span>артисты</span></h1>} />
+        <MediaGrid
+          title={<h1>Альбомы <span>артиста</span></h1>}
+          items={albums.map((a) => ({ ...a, author: profile.username }))}
+          emptyText={albumsLoading ? "Загрузка…" : "Пока нет альбомов."}
+          getTitle={(a) => a?.title ?? ""}
+          getAuthor={(a) => a?.author ?? ""}
+          getCoverSrc={(a) => a?.image_url || "src/static/picture.png"}
+          getReleaseDate={(a) => a?.created_at}
+          onItemClick={(a) => navigate(`/music/albums/${a.id}`)}
+        />
       </div>
     </div>
   );

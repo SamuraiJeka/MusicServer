@@ -26,6 +26,7 @@ class TrackListMapper:
             owner_id=entity.owner_id,
             title=entity.title,
             image_filename=getattr(entity, "image_filename", None),
+            created_at=getattr(entity, "created_at"),
             tracks=tracks,
         )
 
@@ -40,6 +41,7 @@ class TrackListMapper:
             owner_id=entity.owner_id,
             title=entity.title,
             image_filename=getattr(entity, "image_filename", None),
+            created_at=getattr(entity, "created_at"),
             tracks=tracks,
         )
 
@@ -50,6 +52,7 @@ class TrackListMapper:
             owner_id=entity.owner_id,
             title=entity.title,
             image_filename=getattr(entity, "image_filename", None),
+            created_at=getattr(entity, "created_at"),
         )
 
     @staticmethod
@@ -59,6 +62,7 @@ class TrackListMapper:
             owner_id=entity.owner_id,
             title=entity.title,
             image_filename=getattr(entity, "image_filename", None),
+            created_at=getattr(entity, "created_at"),
         )
 
     @staticmethod

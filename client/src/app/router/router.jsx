@@ -7,6 +7,8 @@ import CreateAlbumPage from "../../pages/CreateAlbumPage/CreateAlbumPage"
 import MyLibraryPage from "../../pages/MyLibraryPage/MyLibraryPage"
 import CreatePlaylistPage from "../../pages/CreatePlaylistPage/CreatePlaylistPage"
 import ChatsPage from "../../pages/ChatsPage/ChatsPage"
+import AlbumPage from "../../pages/AlbumPage/AlbumPage"
+import PlaylistPage from "../../pages/PlaylistPage/PlaylistPage"
 import AppLayout from "../layout/AppLayout"
 import RequireAuth from "../../shared/auth/RequireAuth"
 
@@ -40,6 +42,14 @@ const router = createBrowserRouter(
                 {
                     path: "library",
                     element: <MyLibraryPage />,
+                },
+                {
+                    path: "music/albums/:albumId",
+                    element: <AlbumPage />,
+                },
+                {
+                    path: "music/playlists/:playlistId",
+                    element: <PlaylistPage />,
                 },
                 {
                     path: "create-playlist",

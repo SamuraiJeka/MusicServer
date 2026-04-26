@@ -45,6 +45,16 @@ async def list_albums(
         return await MusicService(uow).list_albums(limit=limit, offset=offset, owner_id=owner_id)
 
 
+@router.get("/albums/popular", response_model=list[AlbumSummarySchema])
+async def list_popular_albums(
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> list[AlbumSummarySchema]:
+    async with uow:
+        return await MusicService(uow).list_popular_albums(limit=limit, offset=offset)
+
+
 @router.get("/albums/{album_id}", response_model=AlbumSummarySchema)
 async def get_album(
     album_id: int,

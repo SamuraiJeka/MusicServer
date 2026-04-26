@@ -46,6 +46,7 @@ tracks = Table(
     Column("view", BigInteger, nullable=False, server_default="0"),
     Column("duration", Interval, nullable=False),
     Column("owner_id", ForeignKey("users.id"), nullable=False),
+    Column("created_album_id", ForeignKey("track_lists.id", ondelete="SET NULL"), nullable=True),
 )
 
 
@@ -57,6 +58,7 @@ track_lists = Table(
     Column("owner_id", ForeignKey("users.id"), nullable=False),
     Column("_type", SAEnum(TrackListType, name="track_list_type"), nullable=False),
     Column("image_filename", String(255), nullable=True),
+    Column("created_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
 )
 
 

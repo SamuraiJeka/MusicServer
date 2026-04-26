@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
 from adapters.postgres.sql_uow import SqlAlchemyUnitOfWork
 from application.exceptions import ApplicationError
+from application.schemas.music_schemas import ImageUrlSchema
 from application.services.music_service import MusicService
 from application.schemas.user_schema import UserSchema
 from domain.entities.track_list import TrackListType
@@ -52,6 +53,19 @@ async def update_album_image(
             raise HTTPException(status_code=e.status_code, detail=e.detail) from e
 
 
+@router.get("/albums/{album_id}/image-url", response_model=ImageUrlSchema)
+async def get_album_image_url(
+    album_id: int,
+    user: UserSchema = Depends(get_authenticated_user),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> ImageUrlSchema:
+    async with uow:
+        try:
+            return await MusicService(uow).get_album_image_url(user=user, album_id=album_id)
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
+
+
 @router.post("/playlists/{playlist_id}/image")
 async def add_playlist_image(
     playlist_id: int,
@@ -90,5 +104,18 @@ async def update_playlist_image(
                 filename=file.filename,
                 expected_type=TrackListType.PLAYLIST,
             )
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
+
+
+@router.get("/playlists/{playlist_id}/image-url", response_model=ImageUrlSchema)
+async def get_playlist_image_url(
+    playlist_id: int,
+    user: UserSchema = Depends(get_authenticated_user),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> ImageUrlSchema:
+    async with uow:
+        try:
+            return await MusicService(uow).get_playlist_image_url(user=user, playlist_id=playlist_id)
         except ApplicationError as e:
             raise HTTPException(status_code=e.status_code, detail=e.detail) from e

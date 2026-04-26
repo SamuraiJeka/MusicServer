@@ -15,3 +15,54 @@
     flex-direction: column;
     gap: 30px;
 }
+
+.pageTitle {
+    color: #fff;
+    font-size: 26px;
+    font-family: "Ruslan Display", "Comfortaa", sans-serif;
+    margin: 0;
+}
+
+.pageTitle span {
+    color: #007BFF;
+    font-family: "Ruslan Display", "Comfortaa", sans-serif;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.sectionTitle {
+    color: #fff;
+    font-size: 20px;
+    font-family: "Ruslan Display", "Comfortaa", sans-serif;
+    margin: 0;
+}
+
+.sectionTitle span {
+    color: #007BFF;
+    font-family: "Ruslan Display", "Comfortaa", sans-serif;
+}
+
+.tracks {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info {
+    color: #ccc;
+    font-size: 14px;
+}
+
+.error {
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.35;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.25);
+    white-space: pre-line;
+}
