@@ -19,10 +19,14 @@ export default function PlayerBar() {
     error,
     currentTime,
     duration,
+    volume,
+    repeat,
     togglePlayPause,
     next,
     prev,
     seek,
+    setVolume,
+    toggleRepeat,
   } = useAudioPlayer();
 
   const hasQueue = queue.length > 0;
@@ -32,6 +36,10 @@ export default function PlayerBar() {
   const onSeek = (e) => {
     const v = Number(e.target.value);
     seek(v);
+  };
+
+  const onVolume = (e) => {
+    setVolume(Number(e.target.value));
   };
 
   return (
@@ -49,6 +57,14 @@ export default function PlayerBar() {
         </div>
 
         <div className={styles.controls}>
+        <button
+            type="button"
+            className={`${styles.btn} ${repeat ? styles.btnActive : ""}`}
+            onClick={toggleRepeat}
+            title={repeat ? "Repeat: включён" : "Repeat: выключен"}
+          >
+            🔁
+          </button>
           <button
             type="button"
             className={styles.btn}
@@ -91,6 +107,21 @@ export default function PlayerBar() {
             disabled={!hasQueue || !duration}
           />
           <span className={styles.tt}>{formatTime(duration)}</span>
+        </div>
+
+        <div className={styles.volume}>
+          <span className={styles.volIcon} title="Громкость">
+            🔊
+          </span>
+          <input
+            className={styles.volRange}
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={volume}
+            onChange={onVolume}
+          />
         </div>
       </div>
     </div>

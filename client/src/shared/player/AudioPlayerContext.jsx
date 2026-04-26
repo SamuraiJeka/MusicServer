@@ -9,6 +9,7 @@ import {
 } from "react";
 import { http } from "../api/http";
 import PlayerBar from "./PlayerBar";
+import { useAuth } from "../auth/AuthContext";
 
 const AudioPlayerContext = createContext(null);
 
@@ -23,6 +24,14 @@ export function AudioPlayerProvider({ children }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(0.9);
+  const [repeat, setRepeat] = useState(false);
+
+  const { isAuthenticated } = useAuth();
+  // NOTE: This provider is mounted above RouterProvider (see `src/main.jsx`),
+  // so we must not use react-router hooks here. We still hide the bar on `/auth`.
+  const shouldShowBar =
+    isAuthenticated && !(typeof window !== "undefined" && window.location?.pathname === "/auth");
 
   queueRef.current = queue;
 
@@ -76,6 +85,11 @@ export function AudioPlayerProvider({ children }) {
     if (!el) return;
 
     const onEnded = () => {
+      if (repeat) {
+        el.currentTime = 0;
+        el.play().catch(() => {});
+        return;
+      }
       setIndex((i) => {
         const len = queueRef.current.length;
         if (len === 0) return 0;
@@ -103,6 +117,12 @@ export function AudioPlayerProvider({ children }) {
       el.removeEventListener("loadedmetadata", onLoadedMeta);
     };
   }, []);
+
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    el.volume = Math.max(0, Math.min(volume, 1));
+  }, [volume]);
 
   useEffect(() => {
     if (queue.length === 0) {
@@ -165,12 +185,16 @@ export function AudioPlayerProvider({ children }) {
       error,
       currentTime,
       duration,
+      volume,
+      repeat,
       playQueue,
       playTrack,
       next,
       prev,
       togglePlayPause,
       seek,
+      setVolume,
+      toggleRepeat: () => setRepeat((v) => !v),
     }),
     [
       queue,
@@ -181,6 +205,8 @@ export function AudioPlayerProvider({ children }) {
       error,
       currentTime,
       duration,
+      volume,
+      repeat,
       playQueue,
       playTrack,
       next,
@@ -194,7 +220,7 @@ export function AudioPlayerProvider({ children }) {
     <AudioPlayerContext.Provider value={value}>
       <audio ref={audioRef} style={{ display: "none" }} preload="metadata" />
       {children}
-      <PlayerBar />
+      {shouldShowBar ? <PlayerBar /> : null}
     </AudioPlayerContext.Provider>
   );
 }

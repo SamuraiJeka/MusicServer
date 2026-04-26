@@ -4,8 +4,18 @@ import { http } from "../../shared/api/http";
 
 function formatDuration(value) {
   if (!value) return "";
-  // Backend sends Postgres interval; it may serialize as "HH:MM:SS" or similar.
   if (typeof value === "string") {
+    if (value.startsWith("PT")) {
+      const m = value.match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?$/);
+      if (m) {
+        const h = Number(m[1] || 0);
+        const mm = Number(m[2] || 0);
+        const ss = Number(m[3] || 0);
+        const totalMin = h * 60 + mm;
+        return `${String(totalMin).padStart(2, "0")}:${String(Math.floor(ss)).padStart(2, "0")}`;
+      }
+    }
+
     const parts = value.split(":").map((p) => Number(p));
     if (parts.length >= 2 && parts.every((n) => Number.isFinite(n))) {
       const h = parts.length === 3 ? parts[0] : 0;
