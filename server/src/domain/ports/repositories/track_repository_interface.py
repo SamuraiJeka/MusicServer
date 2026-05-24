@@ -29,3 +29,7 @@ class TrackRepositoryInterface(ABC):
     @abstractmethod
     async def search_by_title(self, query: str, limit: int, offset: int = 0) -> list[Track]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def increment_view(self, track_id: int) -> int | None:
+        raise NotImplementedError

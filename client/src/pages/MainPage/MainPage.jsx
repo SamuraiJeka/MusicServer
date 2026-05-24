@@ -85,9 +85,12 @@ const MainPage = () => {
 
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>
-            Треки <span>популярные</span>
+            Треки <span>по прослушиваниям</span>
           </h2>
           <div className={styles.tracks}>
+            {!loading && popularTracks.length === 0 ? (
+              <div className={styles.info}>Пока нет треков.</div>
+            ) : null}
             {popularTracks.map((tr, idx) => (
               <TrackRow
                 key={String(tr.id)}
@@ -97,7 +100,16 @@ const MainPage = () => {
                 author={""}
                 duration={tr.duration}
                 coverSrc={tr.cover_url || "src/static/picture.png"}
-                onClick={() => player.playQueue(popularTracks, idx)}
+                onClick={() =>
+                  player.playQueue(
+                    popularTracks.map((t) => ({
+                      id: t.id,
+                      title: t.title,
+                      artist: "",
+                    })),
+                    idx
+                  )
+                }
               />
             ))}
           </div>

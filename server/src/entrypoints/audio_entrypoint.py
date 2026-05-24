@@ -9,6 +9,7 @@ from application.schemas.music_schemas import (
     PostTrackSchema,
     TrackSchema,
     TrackAudioUrlSchema,
+    TrackListenResponseSchema,
 )
 from application.schemas.user_schema import UserSchema
 from application.services.music_service import MusicService
@@ -26,6 +27,20 @@ async def get_track_audio_url(
     async with uow:
         try:
             return await MusicService(uow).get_track_audio_url(user=user, track_id=track_id)
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
+
+
+@router.post("/tracks/{track_id}/listen", response_model=TrackListenResponseSchema)
+async def record_track_listen(
+    track_id: int,
+    user: UserSchema = Depends(get_authenticated_user),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> TrackListenResponseSchema:
+    async with uow:
+        try:
+            view = await MusicService(uow).record_track_listen(user=user, track_id=track_id)
+            return TrackListenResponseSchema(view=view)
         except ApplicationError as e:
             raise HTTPException(status_code=e.status_code, detail=e.detail) from e
 

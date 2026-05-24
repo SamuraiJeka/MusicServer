@@ -288,6 +288,15 @@ class MusicService:
         url = await presign_track_audio(track.audio_key, expires_in=expires_in)
         return TrackAudioUrlSchema(url=url, expires_in=expires_in)
 
+    async def record_track_listen(self, user: UserSchema, track_id: int) -> int:
+        self._require_user_id(user)
+        if track_id <= 0:
+            raise BadRequestError("Invalid track_id")
+        new_view = await self._uow.track_repo.increment_view(track_id)
+        if new_view is None:
+            raise NotFoundError("Track not found.")
+        return new_view
+
     async def get_album(self, album_id: int) -> AlbumSummarySchema:
         album = await self._uow.track_list_repo.get_by_id(album_id)
         if album is None or album._type != TrackListType.ALBUM:

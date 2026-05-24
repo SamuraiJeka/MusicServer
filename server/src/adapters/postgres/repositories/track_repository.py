@@ -56,3 +56,11 @@ class TrackRepository(TrackRepositoryInterface):
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
+
+    async def increment_view(self, track_id: int) -> int | None:
+        track = await self.get_by_id(track_id)
+        if track is None:
+            return None
+        track.view = int(track.view or 0) + 1
+        await self._session.flush()
+        return int(track.view)

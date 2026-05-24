@@ -25,6 +25,10 @@ class TrackAudioUrlSchema(BaseModel):
     expires_in: int = 3600
 
 
+class TrackListenResponseSchema(BaseModel):
+    view: int
+
+
 class ImageUrlSchema(BaseModel):
     url: str
     expires_in: int = 3600

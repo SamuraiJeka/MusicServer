@@ -12,10 +12,18 @@ import PlayerBar from "./PlayerBar";
 import { useAuth } from "../auth/AuthContext";
 
 const AudioPlayerContext = createContext(null);
+const LISTEN_THRESHOLD_SEC = 10;
+
+function isCountableTrack(track) {
+  if (!track || track.kind === "chat") return false;
+  const id = Number(track.id);
+  return Number.isFinite(id) && id > 0;
+}
 
 export function AudioPlayerProvider({ children }) {
   const audioRef = useRef(null);
   const queueRef = useRef([]);
+  const listenRecordedRef = useRef(null);
 
   const [queue, setQueue] = useState([]);
   const [index, setIndex] = useState(0);
@@ -204,6 +212,33 @@ export function AudioPlayerProvider({ children }) {
 
     return () => {
       cancelled = true;
+    };
+  }, [queue, index]);
+
+  useEffect(() => {
+    const el = audioRef.current;
+    const track = queue[index];
+    if (!el || !isCountableTrack(track)) {
+      listenRecordedRef.current = null;
+      return undefined;
+    }
+
+    const trackId = Number(track.id);
+    listenRecordedRef.current = null;
+
+    const recordListen = () => {
+      if (listenRecordedRef.current === trackId) return;
+      if (el.currentTime < LISTEN_THRESHOLD_SEC) return;
+      listenRecordedRef.current = trackId;
+      http.post(`/music/tracks/${trackId}/listen`).catch(() => {});
+    };
+
+    el.addEventListener("timeupdate", recordListen);
+    el.addEventListener("seeked", recordListen);
+
+    return () => {
+      el.removeEventListener("timeupdate", recordListen);
+      el.removeEventListener("seeked", recordListen);
     };
   }, [queue, index]);
 
