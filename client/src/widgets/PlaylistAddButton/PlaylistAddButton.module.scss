@@ -1,0 +1,85 @@
+.wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.plusBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.18);
+  color: #fff;
+  font-weight: 900;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.plusBtn:hover,
+.plusBtnActive {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(0, 123, 255, 0.35);
+}
+
+.menuPortal {
+  position: fixed;
+  z-index: 1000;
+  width: 260px;
+  max-height: 280px;
+  overflow: auto;
+  border-radius: 12px;
+  background: #063553;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.menuTitle {
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.menuInfo {
+  font-size: 12px;
+  color: #ccc;
+  padding: 4px 0;
+}
+
+.menuError {
+  font-size: 12px;
+  color: #ff8a8a;
+  padding: 4px 0;
+}
+
+.menuList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menuItem {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.2);
+  color: #fff;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menuItem:hover:not(:disabled) {
+  background: rgba(0, 123, 255, 0.22);
+}
+
+.menuItem:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

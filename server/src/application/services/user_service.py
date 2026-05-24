@@ -1,6 +1,6 @@
 from domain.ports.uow_interface import UoWInterface
 from application.mappers.user_mapper import UserMapper
-from application.schemas.user_schema import UserSchema, UserMeSchema
+from application.schemas.user_schema import UserSchema, UserMeSchema, UserPublicSchema
 from application.exceptions import BadRequestError, NotFoundError
 from application.services.user_avatar_presign import presign_user_avatar
 
@@ -45,6 +45,19 @@ class UserService:
             if u is None:
                 raise NotFoundError("User not found")
             return await self._me_schema(u)
+
+    async def get_public_profile(self, user_id: int) -> UserPublicSchema:
+        if user_id <= 0:
+            raise BadRequestError("Invalid user_id")
+        async with self._uow:
+            u = await self._uow.user_repo.get_by_id(user_id)
+            if u is None or u.id is None:
+                raise NotFoundError("User not found")
+            avatar_url = None
+            key = getattr(u, "avatar_key", None)
+            if key:
+                avatar_url = await presign_user_avatar(key)
+            return UserPublicSchema(id=u.id, username=u.username, avatar_url=avatar_url)
 
     async def update_avatar(
         self,

@@ -65,6 +65,19 @@ async def list_my_tracks_by_views(
         return await MusicService(uow).list_my_tracks_by_views(user, limit)
 
 
+@router.get("/users/{user_id}/tracks", response_model=list[TrackSchema])
+async def list_user_tracks_by_views(
+    user_id: int,
+    limit: int | None = Query(default=20, ge=1, le=500),
+    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
+) -> list[TrackSchema]:
+    async with uow:
+        try:
+            return await MusicService(uow).list_user_tracks_by_views(user_id, limit)
+        except ApplicationError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail) from e
+
+
 @router.get("/tracks/popular", response_model=list[TrackSchema])
 async def list_popular_tracks(
     limit: int = Query(default=50, ge=1, le=100),

@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import styles from "./ArtistPage.module.scss";
 
-import SongList from "../../widgets/SongList/SongList";
 import MediaGrid from "../../widgets/MediaGrid/MediaGrid";
 import { http } from "../../shared/api/http";
 import TrackRow from "../../widgets/TrackRow/TrackRow";
 import { useAudioPlayer } from "../../shared/player/AudioPlayerContext";
 
 const ArtistPage = () => {
+  const { userId: userIdParam } = useParams();
+  const isOwnProfile = !userIdParam;
+  const profileUserId = userIdParam ? Number(userIdParam) : null;
+
   const [profile, setProfile] = useState({ username: "…", avatar_url: null });
   const [albums, setAlbums] = useState([]);
   const [albumsLoading, setAlbumsLoading] = useState(true);
@@ -19,7 +22,8 @@ const ArtistPage = () => {
 
   const loadProfile = useCallback(async () => {
     try {
-      const { data } = await http.get("/user/me");
+      const url = isOwnProfile ? "/user/me" : `/user/${profileUserId}`;
+      const { data } = await http.get(url);
       setProfile({
         username: data.username,
         avatar_url: data.avatar_url ?? null,
@@ -27,12 +31,15 @@ const ArtistPage = () => {
     } catch {
       setProfile({ username: "Профиль", avatar_url: null });
     }
-  }, []);
+  }, [isOwnProfile, profileUserId]);
 
   const loadAlbums = useCallback(async () => {
     setAlbumsLoading(true);
     try {
-      const { data } = await http.get("/music/me/albums");
+      const url = isOwnProfile
+        ? "/music/me/albums"
+        : `/music/users/${profileUserId}/albums`;
+      const { data } = await http.get(url);
       const raw = data || [];
       const withCovers = await Promise.all(
         raw.map(async (al) => {
@@ -51,12 +58,15 @@ const ArtistPage = () => {
     } finally {
       setAlbumsLoading(false);
     }
-  }, []);
+  }, [isOwnProfile, profileUserId]);
 
   const loadTopTracks = useCallback(async () => {
     setTracksLoading(true);
     try {
-      const { data } = await http.get("/music/me/tracks", { params: { limit: 20 } });
+      const url = isOwnProfile
+        ? "/music/me/tracks"
+        : `/music/users/${profileUserId}/tracks`;
+      const { data } = await http.get(url, { params: { limit: 20 } });
       const raw = data || [];
       const coverCache = new Map();
       const withCovers = await Promise.all(
@@ -81,7 +91,7 @@ const ArtistPage = () => {
     } finally {
       setTracksLoading(false);
     }
-  }, []);
+  }, [isOwnProfile, profileUserId]);
 
   useEffect(() => {
     loadProfile();
@@ -96,10 +106,17 @@ const ArtistPage = () => {
   }, [loadTopTracks]);
 
   useEffect(() => {
+    if (!isOwnProfile) return undefined;
     const onAvatar = () => loadProfile();
     window.addEventListener("avatar-updated", onAvatar);
     return () => window.removeEventListener("avatar-updated", onAvatar);
-  }, [loadProfile]);
+  }, [loadProfile, isOwnProfile]);
+
+  const queueTracks = topTracks.map((tr) => ({
+    id: tr.id,
+    title: tr.title,
+    artist: profile.username,
+  }));
 
   return (
     <div className={styles.wrapper}>
@@ -117,7 +134,9 @@ const ArtistPage = () => {
         </h2>
         <div className={styles.tracks}>
           {tracksLoading ? <div style={{ color: "#ccc" }}>Загрузка…</div> : null}
-          {!tracksLoading && topTracks.length === 0 ? <div style={{ color: "#ccc" }}>Пока нет треков.</div> : null}
+          {!tracksLoading && topTracks.length === 0 ? (
+            <div style={{ color: "#ccc" }}>Пока нет треков.</div>
+          ) : null}
           {topTracks.map((tr, idx) => (
             <TrackRow
               key={String(tr.id)}
@@ -127,14 +146,17 @@ const ArtistPage = () => {
               author={profile.username}
               duration={tr.duration}
               coverSrc={tr.cover_url || "src/static/picture.png"}
-              onClick={() => player.playQueue(topTracks, idx)}
+              onClick={() => player.playQueue(queueTracks, idx)}
             />
           ))}
         </div>
 
-        <SongList />
         <MediaGrid
-          title={<h1>Альбомы <span>артиста</span></h1>}
+          title={
+            <h1>
+              Альбомы <span>артиста</span>
+            </h1>
+          }
           items={albums.map((a) => ({ ...a, author: profile.username }))}
           emptyText={albumsLoading ? "Загрузка…" : "Пока нет альбомов."}
           getTitle={(a) => a?.title ?? ""}

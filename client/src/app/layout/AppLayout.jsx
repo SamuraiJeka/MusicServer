@@ -63,6 +63,7 @@ export default function AppLayout() {
           <nav className={styles.navBottom}>
             <NavLink
               to="/artist"
+              end
               className={({ isActive }) => `${styles.navLink} ${isActive ? styles.navLinkActive : ""}`}
             >
               Моя карточка

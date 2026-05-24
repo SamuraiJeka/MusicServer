@@ -1,20 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./MyLibraryPage.module.scss";
 import { http } from "../../shared/api/http";
 import MediaGrid from "../../widgets/MediaGrid/MediaGrid";
-
-const MOCK_ALBUMS = [
-  { id: 101, title: "Мой первый альбом" },
-  { id: 102, title: "Избранное (сборник)" },
-  { id: 103, title: "Дорога домой" },
-];
-
-const MOCK_PLAYLISTS = [
-  { id: 201, title: "На повторе" },
-  { id: 202, title: "Тренировка" },
-  { id: 203, title: "Вечерний вайб" },
-];
 
 function safeDetail(err) {
   return err?.response?.data?.detail || "Ошибка загрузки";
@@ -84,16 +72,6 @@ export default function MyLibraryPage() {
     };
   }, []);
 
-  const albumItems = useMemo(() => {
-    if (loading || error) return albums;
-    return albums.length === 0 ? MOCK_ALBUMS : albums;
-  }, [albums, loading, error]);
-
-  const playlistItems = useMemo(() => {
-    if (loading || error) return playlists;
-    return playlists.length === 0 ? MOCK_PLAYLISTS : playlists;
-  }, [playlists, loading, error]);
-
   return (
     <div className={styles.page}>
       <div className={styles.stickyHeader}>
@@ -122,8 +100,8 @@ export default function MyLibraryPage() {
                 Альбомы <span>мои</span>
               </h2>
             }
-            items={albumItems.map((a) => ({ ...a, author: me.username }))}
-            emptyText={loading ? "Загрузка…" : "Пока нет альбомов."}
+            items={albums.map((a) => ({ ...a, author: me.username }))}
+            emptyText={loading ? "Загрузка…" : "У вас пока нет альбомов."}
             getTitle={(a) => a?.title ?? ""}
             getAuthor={(a) => a?.author ?? ""}
             getCoverSrc={(a) => a?.image_url || "src/static/picture.png"}
@@ -139,8 +117,8 @@ export default function MyLibraryPage() {
                 Плейлисты <span>мои</span>
               </h2>
             }
-            items={playlistItems.map((p) => ({ ...p, author: me.username }))}
-            emptyText={loading ? "Загрузка…" : "Пока нет плейлистов."}
+            items={playlists.map((p) => ({ ...p, author: me.username }))}
+            emptyText={loading ? "Загрузка…" : "У вас пока нет плейлистов."}
             getTitle={(p) => p?.title ?? ""}
             getAuthor={(p) => p?.author ?? ""}
             getCoverSrc={(p) => p?.image_url || "src/static/picture.png"}

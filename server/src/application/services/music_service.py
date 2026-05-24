@@ -251,9 +251,14 @@ class MusicService:
     async def list_my_tracks_by_views(
         self, user: UserSchema, limit: int | None = None
     ) -> list[TrackSchema]:
-        tracks = await self._uow.track_repo.list_by_owner_order_by_view_desc(
-            self._require_user_id(user), limit
-        )
+        return await self.list_user_tracks_by_views(self._require_user_id(user), limit)
+
+    async def list_user_tracks_by_views(
+        self, owner_id: int, limit: int | None = None
+    ) -> list[TrackSchema]:
+        if owner_id <= 0:
+            raise BadRequestError("Invalid user_id")
+        tracks = await self._uow.track_repo.list_by_owner_order_by_view_desc(owner_id, limit)
         return [await TrackMapper.entity_to_dto(t) for t in tracks]
 
     async def list_my_albums(self, user: UserSchema) -> list[AlbumSummarySchema]:

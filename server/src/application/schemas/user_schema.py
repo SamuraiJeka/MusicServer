@@ -18,3 +18,9 @@ class UserMeSchema(BaseModel):
     username: str
     email: EmailStr
     avatar_url: str | None = None
+
+
+class UserPublicSchema(BaseModel):
+    id: int
+    username: str
+    avatar_url: str | None = None
