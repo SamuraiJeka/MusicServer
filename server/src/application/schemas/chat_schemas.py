@@ -11,6 +11,19 @@ class ChatSchema(BaseModel):
     created_at: datetime
 
 
+class ChatPeerSchema(BaseModel):
+    id: PositiveInt
+    username: str
+
+
+class ChatSummarySchema(BaseModel):
+    id: PositiveInt
+    created_at: datetime
+    peer: ChatPeerSchema
+    last_message: Optional[str] = None
+    last_message_at: Optional[datetime] = None
+
+
 class MessageSchema(BaseModel):
     id: PositiveInt
     chat_id: PositiveInt
@@ -29,4 +42,12 @@ class MessageHistorySchema(BaseModel):
 
 
 class UploadAudioResponseSchema(BaseModel):
+    audio_key: str
+
+
+class SendTextMessageSchema(BaseModel):
+    text: str
+
+
+class SendAudioMessageSchema(BaseModel):
     audio_key: str

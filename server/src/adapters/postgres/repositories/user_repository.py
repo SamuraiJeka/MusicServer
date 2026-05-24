@@ -51,3 +51,25 @@ class UserRepository(UserRepositoryInterface):
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
+
+    async def search_by_username(
+        self,
+        query: str,
+        limit: int,
+        offset: int = 0,
+        exclude_ids: list[int] | None = None,
+    ) -> list[User]:
+        q = query.strip()
+        stmt = select(User).where(User.username.ilike(f"%{q}%"))  # type: ignore[attr-defined]
+        if exclude_ids:
+            stmt = stmt.where(User.id.not_in(exclude_ids))  # type: ignore[attr-defined]
+        stmt = stmt.order_by(User.username.asc()).limit(limit).offset(offset)  # type: ignore[union-attr]
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_by_ids(self, user_ids: list[int]) -> list[User]:
+        if not user_ids:
+            return []
+        stmt = select(User).where(User.id.in_(user_ids))  # type: ignore[attr-defined]
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())

@@ -4,7 +4,13 @@ from datetime import datetime
 from uuid import uuid4
 
 from application.exceptions import BadRequestError, ForbiddenError, NotFoundError
-from application.schemas.chat_schemas import ChatSchema, MessageHistorySchema, MessageSchema
+from application.schemas.chat_schemas import (
+    ChatPeerSchema,
+    ChatSchema,
+    ChatSummarySchema,
+    MessageHistorySchema,
+    MessageSchema,
+)
 from application.schemas.user_schema import UserSchema
 from application.services.chat_audio_presign import presign_chat_audio
 from domain.entities.message import Message, MessageType
@@ -15,6 +21,12 @@ def _require_user_id(user: UserSchema) -> int:
     if user.id is None:
         raise BadRequestError("Authenticated user must have id")
     return user.id
+
+
+def _message_preview(msg: Message) -> str:
+    if msg.type == MessageType.AUDIO:
+        return "Аудио"
+    return (msg.text or "").strip() or "Сообщение"
 
 
 class ChatService:
@@ -52,6 +64,40 @@ class ChatService:
                     continue
                 out.append(ChatSchema(id=c.id, created_at=c.created_at))
             return out
+
+    async def list_my_chat_summaries(self, user: UserSchema) -> list[ChatSummarySchema]:
+        user_id = _require_user_id(user)
+        async with self._uow:
+            chats = await self._uow.chat_repo.list_by_user(user_id)
+            chat_ids = [c.id for c in chats if c.id is not None]
+            last_by_chat = await self._uow.message_repo.get_last_by_chats(chat_ids)
+
+            summaries: list[ChatSummarySchema] = []
+            for c in chats:
+                if c.id is None or c.created_at is None:
+                    continue
+                peer_id = await self._uow.chat_repo.get_other_member_id(c.id, user_id)
+                if peer_id is None:
+                    continue
+                peer = await self._uow.user_repo.get_by_id(peer_id)
+                if peer is None or peer.id is None:
+                    continue
+                last = last_by_chat.get(c.id)
+                summaries.append(
+                    ChatSummarySchema(
+                        id=c.id,
+                        created_at=c.created_at,
+                        peer=ChatPeerSchema(id=peer.id, username=peer.username),
+                        last_message=_message_preview(last) if last else None,
+                        last_message_at=last.created_at if last else None,
+                    )
+                )
+
+            summaries.sort(
+                key=lambda s: s.last_message_at or s.created_at,
+                reverse=True,
+            )
+            return summaries
 
     async def list_messages(self, user: UserSchema, chat_id: int, limit: int, offset: int) -> MessageHistorySchema:
         user_id = _require_user_id(user)
@@ -133,6 +179,9 @@ class ChatService:
     async def create_audio_message(self, user: UserSchema, chat_id: int, audio_key: str) -> MessageSchema:
         user_id = _require_user_id(user)
         if not audio_key or "/" not in audio_key:
+            raise BadRequestError("Invalid audio_key")
+        expected_prefix = f"chat_uploads/{user_id}/"
+        if not audio_key.startswith(expected_prefix):
             raise BadRequestError("Invalid audio_key")
 
         async with self._uow:

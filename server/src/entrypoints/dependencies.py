@@ -53,23 +53,28 @@ async def get_authenticated_user(
         raise credentials_exception
 
 
-async def get_ws_authenticated_user(
+async def authenticate_websocket(
     websocket: WebSocket,
-    uow: SqlAlchemyUnitOfWork = Depends(get_uow),
-) -> UserSchema:
+    uow: SqlAlchemyUnitOfWork,
+) -> UserSchema | None:
     token = websocket.query_params.get("token")
     if not token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing token")
+        await websocket.close(code=1008, reason="Missing token")
+        return None
 
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         if payload.get("type") != "access":
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token type")
+            await websocket.close(code=1008, reason="Invalid token type")
+            return None
         email = payload.get("email")
         if not email:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
+            await websocket.close(code=1008, reason="Invalid token payload")
+            return None
         return await UserService(uow).get_by_email(email)
     except jwt.exceptions.ExpiredSignatureError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
+        await websocket.close(code=1008, reason="Token has expired")
+        return None
     except jwt.exceptions.PyJWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+        await websocket.close(code=1008, reason="Could not validate credentials")
+        return None

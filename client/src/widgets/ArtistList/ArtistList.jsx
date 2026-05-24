@@ -28,9 +28,6 @@ const ArtistList = ({title}) => {
         }
     ])
 
-
-    // TODO Тут обращение к сервису API и получение даты
-    
     return (
         <div className={styles.wrapper}>
             <div className={styles.title_list}>

@@ -50,6 +50,26 @@ export function AudioPlayerProvider({ children }) {
     playQueue([track], 0);
   }, [playQueue]);
 
+  const playChatAudio = useCallback(
+    ({ messageId, audioUrl, title, artist }) => {
+      if (!messageId || !audioUrl) return;
+      playQueue(
+        [
+          {
+            id: `chat:${messageId}`,
+            kind: "chat",
+            audioUrl,
+            title: title || "Голосовое сообщение",
+            artist: artist || "",
+            messageId,
+          },
+        ],
+        0
+      );
+    },
+    [playQueue]
+  );
+
   const next = useCallback(() => {
     setIndex((i) => {
       const len = queueRef.current.length;
@@ -147,11 +167,19 @@ export function AudioPlayerProvider({ children }) {
       setLoadingUrl(true);
       setError(null);
       try {
-        const { data } = await http.get(`/music/tracks/${track.id}/audio-url`);
-        if (cancelled) return;
         const el = audioRef.current;
         if (!el) return;
-        el.src = data.url;
+
+        let url;
+        if (track.kind === "chat" && track.audioUrl) {
+          url = track.audioUrl;
+        } else {
+          const { data } = await http.get(`/music/tracks/${track.id}/audio-url`);
+          url = data.url;
+        }
+
+        if (cancelled) return;
+        el.src = url;
         try {
           await el.play();
         } catch (playErr) {
@@ -163,7 +191,11 @@ export function AudioPlayerProvider({ children }) {
         }
       } catch (e) {
         if (!cancelled) {
-          setError(e?.response?.data?.detail || "Не удалось загрузить аудио");
+          setError(
+            typeof e?.response?.data?.detail === "string"
+              ? e.response.data.detail
+              : "Не удалось загрузить аудио"
+          );
         }
       } finally {
         if (!cancelled) setLoadingUrl(false);
@@ -189,6 +221,7 @@ export function AudioPlayerProvider({ children }) {
       repeat,
       playQueue,
       playTrack,
+      playChatAudio,
       next,
       prev,
       togglePlayPause,
@@ -209,6 +242,7 @@ export function AudioPlayerProvider({ children }) {
       repeat,
       playQueue,
       playTrack,
+      playChatAudio,
       next,
       prev,
       togglePlayPause,

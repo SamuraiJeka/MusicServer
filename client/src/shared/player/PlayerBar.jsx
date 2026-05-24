@@ -30,6 +30,7 @@ export default function PlayerBar() {
   } = useAudioPlayer();
 
   const hasQueue = queue.length > 0;
+  const isChat = currentTrack?.kind === "chat";
   const canPrev = hasQueue && index > 0;
   const canNext = hasQueue && index < queue.length - 1;
 
@@ -61,6 +62,7 @@ export default function PlayerBar() {
             type="button"
             className={`${styles.btn} ${repeat ? styles.btnActive : ""}`}
             onClick={toggleRepeat}
+            disabled={isChat}
             title={repeat ? "Repeat: включён" : "Repeat: выключен"}
           >
             🔁

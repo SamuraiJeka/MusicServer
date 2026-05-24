@@ -16,3 +16,7 @@ class MessageRepositoryInterface(ABC):
         offset: int,
     ) -> list[Message]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def get_last_by_chats(self, chat_ids: list[int]) -> dict[int, Message]:
+        raise NotImplementedError

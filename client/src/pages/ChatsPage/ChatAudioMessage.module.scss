@@ -1,0 +1,128 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+  max-width: 300px;
+  user-select: none;
+}
+
+.hiddenAudio {
+  display: none;
+}
+
+.playBtn {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  transition: background-color 0.15s ease, transform 0.1s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
+.mine .playBtn {
+  background: rgba(0, 123, 255, 0.55);
+
+  &:hover:not(:disabled) {
+    background: rgba(0, 123, 255, 0.72);
+  }
+}
+
+.theirs .playBtn {
+  background: rgba(255, 255, 255, 0.12);
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.wave {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 0 2px;
+  outline: none;
+
+  &:focus-visible {
+    border-radius: 6px;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.45);
+  }
+}
+
+.bar {
+  flex: 1;
+  max-width: 4px;
+  min-width: 2px;
+  height: calc(var(--h) * 100%);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.28);
+  transition: background-color 0.12s ease;
+}
+
+.barPlayed {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.mine .barPlayed {
+  background: #7ec8ff;
+}
+
+.time {
+  flex-shrink: 0;
+  min-width: 38px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.75);
+  text-align: right;
+}
+
+.unavailable {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.active .playBtn {
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.45);
+}
+
+[data-playing] .time {
+  color: #fff;
+}
