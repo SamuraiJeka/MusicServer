@@ -4,6 +4,7 @@ import styles from "./PlaylistPage.module.scss";
 import { http } from "../../shared/api/http";
 import TrackRow from "../../widgets/TrackRow/TrackRow";
 import { useAudioPlayer } from "../../shared/player/AudioPlayerContext";
+import fallbackCover from "../../static/picture.png";
 
 function safeDetail(err) {
   return err?.response?.data?.detail || "Ошибка загрузки";
@@ -43,7 +44,7 @@ export default function PlaylistPage() {
     try {
       const [p, my] = await Promise.all([http.get(`/music/playlists/${idNum}`), http.get("/user/me")]);
       setPlaylist(p.data);
-      setTracks(p.data?.tracks || []);
+      const tracksRaw = p.data?.tracks || [];
       setMe({ username: my.data?.username || "" });
 
       if (p.data?.image_filename) {
@@ -56,6 +57,25 @@ export default function PlaylistPage() {
       } else {
         setCoverUrl(null);
       }
+
+      const coverCache = new Map();
+      const tracksWithCovers = await Promise.all(
+        tracksRaw.map(async (tr) => {
+          const albumId = tr?.created_album_id;
+          if (!albumId) return { ...tr, cover_url: null };
+          if (coverCache.has(albumId)) return { ...tr, cover_url: coverCache.get(albumId) };
+          try {
+            const resp = await http.get(`/music/albums/${albumId}/image-url`);
+            const url = resp.data?.url || null;
+            coverCache.set(albumId, url);
+            return { ...tr, cover_url: url };
+          } catch {
+            coverCache.set(albumId, null);
+            return { ...tr, cover_url: null };
+          }
+        })
+      );
+      setTracks(tracksWithCovers);
     } catch (e) {
       setError(safeDetail(e));
     } finally {
@@ -77,7 +97,7 @@ export default function PlaylistPage() {
           <>
             <div className={styles.header}>
               <div className={styles.cover}>
-                <img src={coverUrl || "src/static/picture.png"} alt="" />
+                <img src={coverUrl || fallbackCover} alt="" />
               </div>
               <div className={styles.info}>
                 <h1 className={styles.title}>{playlist.title}</h1>
@@ -95,8 +115,17 @@ export default function PlaylistPage() {
                   title={tr.title}
                   author={me.username || ""}
                   duration={tr.duration}
-                  coverSrc={coverUrl}
-                  onClick={() => player.playQueue(tracks, idx)}
+                  coverSrc={tr.cover_url || fallbackCover}
+                  onClick={() =>
+                    player.playQueue(
+                      tracks.map((t) => ({
+                        id: t.id,
+                        title: t.title,
+                        artist: me.username || "",
+                      })),
+                      idx
+                    )
+                  }
                 />
               ))}
             </div>

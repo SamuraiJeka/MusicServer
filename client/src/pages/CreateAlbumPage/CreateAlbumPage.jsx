@@ -88,7 +88,7 @@ export default function CreateAlbumPage() {
         await http.post(`/music/albums/${albumId}/image`, fd);
       }
 
-      // 3) tracks (sequential to keep UX predictable)
+      
       for (const t of tracks) {
         const tTitle = t.title.trim();
         if (!tTitle || !t.file) continue;
